@@ -181,6 +181,20 @@ CREATE TABLE api_tokens (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- Journal des corrections d'evenements. Un score corrige doit rester
+-- auditable : le principe II demande que chaque chiffre soit tracable, ce qui
+-- suppose de savoir ce qui a ete retire et par qui (ecart E4).
+CREATE TABLE event_log (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  match_id INT NOT NULL,
+  event_id INT DEFAULT NULL,
+  action ENUM('delete','update') NOT NULL,
+  payload JSON DEFAULT NULL,            -- l'evenement tel qu'il etait avant
+  user_id INT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_event_log_match (match_id)
+) ENGINE=InnoDB;
+
 CREATE TABLE device_tokens (
   id INT AUTO_INCREMENT PRIMARY KEY,
   expo_token VARCHAR(200) NOT NULL UNIQUE,

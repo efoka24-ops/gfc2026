@@ -38,6 +38,12 @@ return [
         'name'            => 'Garoua Football Challenge',
         'current_season'  => 1,
         'token_ttl_hours' => 12,
+        // Nombre de places qualificatives au classement du championnat.
+        // 8 pour la 6e edition : les quarts de finale du Grand Prix Gabriel
+        // MBAIROBE se jouent a 8 equipes sur les 10 engagees (decision D11).
+        // Valeur de configuration, jamais codee en dur dans une requete : une
+        // edition a 12 equipes ne doit pas demander de toucher au code.
+        'qualification_places' => 8,
         'upload_dir'      => __DIR__ . '/../public/uploads',
         'base_url'        => $value('base_url', 'GFC_BASE_URL', 'http://localhost:8000'),
     ],
