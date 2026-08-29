@@ -40,9 +40,16 @@ export const type = {
   stat:    { fontFamily: fonts.display, fontSize: 18, color: colors.bordeaux },
 };
 
-// Le classement des 4 premiers est qualificatif, les 2 derniers jouent les barrages
-export const standingZone = (position, total) => {
-  if (position <= 4) return { bg: colors.orange, fg: '#2A0A12' };
-  if (position > total - 2) return { bg: '#C9BFB6', fg: '#FFFFFF' };
+/**
+ * Couleurs du rang au classement, d'après la zone renvoyée par l'API.
+ *
+ * Le nombre de places qualificatives est une donnée de la compétition, pas une
+ * constante de l'application : il vaut 8 pour la 6e édition (quarts de finale
+ * du Grand Prix) et pourrait changer d'une édition à l'autre. L'écran se
+ * contente donc de colorer ce que le serveur a calculé.
+ */
+export const standingZone = (zone) => {
+  if (zone === 'qualification') return { bg: colors.orange, fg: '#2A0A12' };
+  if (zone === 'barrage') return { bg: '#C9BFB6', fg: '#FFFFFF' };
   return { bg: '#F0E6DA', fg: '#6B5A53' };
 };

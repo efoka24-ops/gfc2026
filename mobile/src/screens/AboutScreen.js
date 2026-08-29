@@ -68,6 +68,20 @@ export default function AboutScreen({ navigation }) {
             <Text style={{ fontFamily: fonts.bodyBold, fontSize: 11.5, color: '#2A0A12' }}>Inscrire une équipe</Text>
           </Pressable>
         </View>
+
+        {/* Accès à l'espace de saisie. Volontairement discret et en bas de
+            page : il ne s'adresse qu'aux commissaires, commentateurs et
+            organisateurs, pas au public (FR-036). */}
+        <View style={{ height: 1, backgroundColor: colors.line, marginTop: spacing.md }} />
+        <Pressable
+          onPress={() => navigation.navigate('Connexion')}
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14 }}
+        >
+          <Icon name="whistle" size={15} color={colors.faint} />
+          <Text style={{ fontFamily: fonts.bodyBold, fontSize: 11.5, color: colors.faint }}>
+            Espace opérateur
+          </Text>
+        </Pressable>
       </View>
     </ScrollView>
   );

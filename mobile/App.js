@@ -23,6 +23,13 @@ import MediaScreen from './src/screens/MediaScreen';
 import CompetitionsScreen from './src/screens/CompetitionsScreen';
 import AboutScreen from './src/screens/AboutScreen';
 
+import { FournisseurOperateur } from './src/auth';
+import ConnexionScreen from './src/screens/operateur/ConnexionScreen';
+import MesMatchsScreen from './src/screens/operateur/MesMatchsScreen';
+import CompositionScreen from './src/screens/operateur/CompositionScreen';
+import SaisieLiveScreen from './src/screens/operateur/SaisieLiveScreen';
+import ClotureScreen from './src/screens/operateur/ClotureScreen';
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -90,17 +97,34 @@ export default function App() {
   if (!ready) return <View style={{ flex: 1, backgroundColor: colors.bordeaux }} />;
 
   return (
-    <NavigationContainer>
-      <StatusBar style="light" backgroundColor={colors.bordeaux} />
-      <Stack.Navigator screenOptions={{ header, contentStyle: { backgroundColor: colors.cream } }}>
-        <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
-        <Stack.Screen name="Match" component={MatchScreen} options={{ title: 'Match', kicker: 'En direct' }} />
-        <Stack.Screen name="Effectif" component={SquadScreen} options={{ title: 'Effectif' }} />
-        <Stack.Screen name="Joueur" component={PlayerScreen} options={{ title: 'Fiche joueur' }} />
-        <Stack.Screen name="Medias" component={MediaScreen} options={{ title: 'Photos & vidéos', kicker: 'Édition en cours' }} />
-        <Stack.Screen name="Competitions" component={CompetitionsScreen} options={{ title: 'Compétitions', kicker: '3 compétitions' }} />
-        <Stack.Screen name="Apropos" component={AboutScreen} options={{ title: 'À propos', kicker: 'Since 2020' }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <FournisseurOperateur>
+      <NavigationContainer>
+        <StatusBar style="light" backgroundColor={colors.bordeaux} />
+        <Stack.Navigator screenOptions={{ header, contentStyle: { backgroundColor: colors.cream } }}>
+          {/* ----------------------------------- consultation publique */}
+          <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
+          <Stack.Screen name="Match" component={MatchScreen} options={{ title: 'Match', kicker: 'En direct' }} />
+          <Stack.Screen name="Effectif" component={SquadScreen} options={{ title: 'Effectif' }} />
+          <Stack.Screen name="Joueur" component={PlayerScreen} options={{ title: 'Fiche joueur' }} />
+          <Stack.Screen name="Medias" component={MediaScreen} options={{ title: 'Photos & vidéos', kicker: 'Édition en cours' }} />
+          <Stack.Screen name="Competitions" component={CompetitionsScreen} options={{ title: 'Compétitions', kicker: '3 compétitions' }} />
+          <Stack.Screen name="Apropos" component={AboutScreen} options={{ title: 'À propos', kicker: 'Depuis 2020' }} />
+
+          {/* ------------------------------------ espace opérateur (US8)
+              Cloisonné de la consultation : aucun onglet n'y mène, l'accès
+              se fait par la page « À propos » et tout y exige un compte. */}
+          <Stack.Screen name="Connexion" component={ConnexionScreen}
+            options={{ title: 'Espace opérateur', kicker: 'Réservé à l\'organisation' }} />
+          <Stack.Screen name="MesMatchs" component={MesMatchsScreen}
+            options={{ title: 'Mes matchs', kicker: 'Espace opérateur' }} />
+          <Stack.Screen name="Composition" component={CompositionScreen}
+            options={{ title: 'Composition', kicker: 'Avant le match' }} />
+          <Stack.Screen name="SaisieLive" component={SaisieLiveScreen}
+            options={{ title: 'Saisie du match', kicker: 'Pendant le match' }} />
+          <Stack.Screen name="Cloture" component={ClotureScreen}
+            options={{ title: 'Après-match', kicker: 'Clôture' }} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </FournisseurOperateur>
   );
 }

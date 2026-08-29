@@ -33,8 +33,10 @@ export default function StandingsScreen({ navigation }) {
         </View>
 
         {rows.map((r, i) => {
-          const pos = i + 1;
-          const zone = standingZone(pos, rows.length);
+          // Le rang et la zone viennent du serveur : le classement affiche ne
+          // peut pas diverger de celui que calcule la vue v_standings.
+          const pos = r.rank ?? i + 1;
+          const zone = standingZone(r.zone);
           const diff = Number(r.goal_diff);
           return (
             <Pressable
