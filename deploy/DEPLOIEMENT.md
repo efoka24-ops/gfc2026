@@ -138,3 +138,35 @@ Note : le mot de passe contient le caractère `%`, que la plupart des clients FT
 interprètent dans une URL. Le renseigner comme variable
 (`GFC_FTP_PASS='...'`, en guillemets simples) et non dans une URL de la forme
 `ftp://user:pass@hôte` — sinon l'encoder en `%25`.
+
+## Certificat SSL — à régler avant tout
+
+Vérification faite le 2026-08-29 : `gfc.trugroup.cm` résout bien
+(185.215.180.170) et le serveur répond, mais **le certificat présenté ne couvre
+pas ce sous-domaine** :
+
+```text
+$ curl https://gfc.trugroup.cm/
+SEC_E_WRONG_PRINCIPAL — le nom de la cible n'est pas correct
+$ curl -k https://gfc.trugroup.cm/     # en ignorant le certificat
+200
+```
+
+C'est bloquant, et pas seulement cosmétique :
+
+- le `.htaccess` racine force HTTPS ; sans certificat valide, toute requête
+  échoue au lieu d'être servie ;
+- Android refuse par défaut les connexions HTTP en clair comme les certificats
+  invalides : l'application mobile ne pourra pas joindre l'API ;
+- les jetons d'écriture de la saisie live transiteraient en clair.
+
+**À faire dans cPanel** : émettre un certificat pour `gfc.trugroup.cm` via
+AutoSSL ou Let's Encrypt (section « SSL/TLS » ou « SSL/TLS Status »), puis
+revérifier :
+
+```bash
+curl -sS -o /dev/null -w '%{http_code}\n' https://gfc.trugroup.cm/
+```
+
+Tant que cette commande n'aboutit pas sans `-k`, ne pas publier l'application
+mobile.
