@@ -9,201 +9,235 @@ vérification passe par les scénarios de recette de `quickstart.md` et par les
 deux portes automatisées (zéro emoji, zéro SQL concaténé). Les tâches de
 vérification sont explicitement nommées.
 
+## Découpe en deux lots
+
+| Lot | Contenu | Échéance |
+|---|---|---|
+| **Lot 1 — MVP** | Une journée de championnat couverte de bout en bout : administrer, saisir en direct depuis le terrain, suivre sur téléphone, voir le classement bouger. | **Coup d'envoi de la 6e édition** |
+| **Lot 2 — Complément** | Ce qui enrichit la compétition une fois qu'elle tourne : talents, statistiques, contenus éditoriaux, notifications. | Pendant l'édition |
+
+La règle de partage : **tout ce qui n'est pas nécessaire pour diffuser le premier
+match est dans le lot 2.** Le lot 1 doit rester tenable ; ce qui déborde bascule
+vers le lot 2, jamais l'inverse.
+
+**La saisie live se fait depuis le mobile.** Le commissaire, le commentateur ou
+l'organisateur saisissent au bord du terrain, sur téléphone (US8). Le back-office
+`live.php` est livré comme filet de secours — il est déjà maquetté, donc peu
+coûteux — mais ce n'est pas le canal principal.
+
 ## Format : `[ID] [P?] [Story] Description`
 
 - **[P]** : parallélisable — fichiers distincts, aucune dépendance
-- **[Story]** : histoire utilisateur concernée (US1 à US7)
+- **[Story]** : histoire utilisateur concernée (US1 à US8)
 - **[web]** / **[mobile]** : branche de travail
 
-## Conventions de chemins
-
-- Branche `web` : `backend/src/`, `backend/public/`, `backend/sql/`
-- Branche `mobile` : `mobile/src/`, `mobile/App.js`
-
 ---
+
+# LOT 1 — MVP
 
 ## Phase 1 : Mise en place
 
-**Objectif** : les deux branches démarrent et communiquent.
-
 - [ ] T001 [web] Poser l'arborescence `backend/` (`config/`, `public/`, `src/`, `sql/`) selon `plan.md`
-- [ ] T002 [P] [mobile] Poser l'arborescence `mobile/` et initialiser le projet Expo (`package.json`, `app.json`, `babel.config.js`)
-- [ ] T003 [web] Écrire `backend/config/config.php` : lecture des variables `GFC_DB_HOST`, `GFC_DB_NAME`, `GFC_DB_USER`, `GFC_DB_PASS`, `GFC_BASE_URL` — aucun secret en dur
-- [ ] T004 [P] [web] Écrire `backend/public/.htaccess` (réécriture vers `index.php`) et documenter l'équivalent Nginx dans `backend/README.md`
-- [ ] T005 [P] [mobile] Régler `expo.extra.apiUrl` dans `mobile/app.json` et documenter `10.0.2.2` pour l'émulateur Android
-- [ ] T006 Écrire les deux portes qualité de `quickstart.md` (zéro emoji, zéro SQL concaténé) comme script exécutable, à lancer avant chaque fusion
-
----
+- [ ] T002 [P] [mobile] Poser l'arborescence `mobile/` et initialiser le projet Expo
+- [x] T003 [web] `backend/config/config.php` : lecture de `config.local.php` puis des variables `GFC_*` — aucun secret en dur
+- [x] T004 [P] [web] `.htaccess` de production et protection de `config/`, `src/`, `sql/`
+- [x] T005 [P] [mobile] Régler `expo.extra.apiUrl` sur `https://gfc.trugroup.cm/api`
+- [ ] T006 Script des deux portes qualité (zéro emoji, zéro SQL concaténé), à lancer avant chaque fusion
 
 ## Phase 2 : Socle bloquant
 
-**Objectif** : le modèle de données, l'accès base, l'authentification et le thème.
 Aucune histoire utilisateur ne peut commencer avant.
 
-- [ ] T007 [web] Écrire `backend/sql/schema.sql` : les 13 tables de `data-model.md`, InnoDB, `utf8mb4_unicode_ci`, index `(match_id, minute)` sur `match_events`
-- [ ] T008 [web] Appliquer l'écart **E1** : ajouter `matches.home_pens` et `matches.away_pens` (TINYINT UNSIGNED, NULL), exclus de `v_standings`
-- [ ] T009 [web] Appliquer l'écart **E2** : ajouter la valeur `cancelled` à l'énumération `matches.status`
-- [ ] T010 [web] Créer la vue `v_standings` dans `schema.sql` : matchs `finished` uniquement, dépliés recevant/visiteur, agrégés en points, différence de buts et bilan (invariant I2)
-- [ ] T011 [P] [web] Écrire `backend/sql/seed.sql` — données de démonstration clairement identifiées comme telles, jamais destinées à la production
-- [ ] T012 [web] Écrire `backend/src/Database.php` : PDO singleton, `ATTR_EMULATE_PREPARES => false`, `ATTR_ERRMODE => EXCEPTION`, `utf8mb4` (principe V)
-- [ ] T013 [P] [web] Écrire `backend/src/Response.php` : réponses JSON, codes HTTP et messages d'erreur en français selon `contracts/api.md`
-- [ ] T014 [web] Écrire `backend/src/Auth.php` : `password_hash`/`password_verify`, session du back-office, jetons d'API expirants (`api_tokens`), jeton CSRF, contrôle de rôle admin/secrétaire/arbitre (FR-024 à FR-028, invariant I7)
-- [ ] T015 [web] Écrire `backend/src/Score.php` : `recompute($matchId)` — score dérivé des événements `goal`, `penalty`, `own_goal` (au crédit de l'adversaire), en transaction avec `SELECT ... FOR UPDATE` sur la ligne du match (invariant I1, écart E3)
-- [ ] T016 [web] Écrire le squelette de `backend/src/Repo.php` : requêtes préparées de lecture et d'écriture, aucune concaténation SQL
-- [ ] T017 [web] Écrire le routeur `backend/public/index.php` : dispatch des routes `/api`, en-têtes `Cache-Control`, gestion centralisée des erreurs
-- [ ] T018 [P] [mobile] Écrire `mobile/src/theme.js` : bordeaux, orange, crème issus du logo ; Anton pour les titres, Manrope pour le texte — seule source de couleurs et de polices (principe III)
-- [ ] T019 [P] [mobile] Écrire `mobile/src/components/Icon.js` : jeu d'icônes SVG maison via `react-native-svg`, aucun emoji, aucune bibliothèque d'icônes tierce
-- [ ] T020 [P] [mobile] Écrire `mobile/src/components/Ui.js` : `Card`, `SectionTitle`, `Chip`, `Segmented`, `LiveDot`, `StatBar`, `MetricRow`, `Loader`, `EmptyState` — états vides et messages en français (FR-029, FR-032)
-- [ ] T021 [P] [mobile] Écrire `mobile/src/components/Crest.js` : écusson d'équipe, logo ou abréviation sur la couleur du club
-- [ ] T022 [mobile] Écrire `mobile/src/api.js` : client REST, cache mémoire 60 s, repli AsyncStorage avec indicateur « données non à jour », `usePolling(15s)` actif seulement au premier plan (décision D6, FR-031)
-- [ ] T023 [mobile] Écrire `mobile/App.js` : 5 onglets et la pile de navigation (match, effectif, joueur, médias, compétitions, à propos), en-tête commun
+- [ ] T007 [web] `backend/sql/schema.sql` : les 13 tables de `data-model.md`, InnoDB, `utf8mb4_unicode_ci`, index `(match_id, minute)` sur `match_events`
+- [ ] T008 [web] Écart **E1** : `matches.home_pens` et `matches.away_pens`, exclus de `v_standings` — nécessaires au Grand Prix (décision D11)
+- [ ] T009 [web] Écart **E2** : valeur `cancelled` dans l'énumération `matches.status`
+- [ ] T010 [web] Écart **E5** : `match_events.client_ref` + unicité `(match_id, client_ref)` — idempotence des saisies mobiles hors réseau (FR-041)
+- [ ] T011 [web] Vue `v_standings` : matchs `finished` uniquement, dépliés recevant/visiteur, agrégés en points et différence de buts (invariant I2)
+- [ ] T012 [P] [web] `backend/sql/seed.sql` — démonstration uniquement, jamais en production
+- [ ] T013 [web] `backend/src/Database.php` : PDO, `ATTR_EMULATE_PREPARES => false`, `ERRMODE_EXCEPTION`, `utf8mb4` (principe V)
+- [ ] T014 [P] [web] `backend/src/Response.php` : JSON, codes HTTP et messages d'erreur en français
+- [ ] T015 [web] `backend/src/Auth.php` : `password_hash`/`password_verify`, session du back-office, jetons d'API expirants, CSRF, contrôle des trois rôles (FR-024 à FR-028, invariant I7)
+- [ ] T016 [web] `backend/src/Score.php` : `recompute($matchId)` en transaction avec `SELECT ... FOR UPDATE` sur la ligne du match (invariant I1, écart E3)
+- [ ] T017 [web] `backend/src/Repo.php` : requêtes préparées, aucune concaténation SQL
+- [ ] T018 [web] Routeur `backend/public/index.php` : dispatch `/api`, en-têtes `Cache-Control`, erreurs centralisées
+- [ ] T019 [P] [mobile] `mobile/src/theme.js` : charte issue du logo — seule source de couleurs et de polices (principe III)
+- [ ] T020 [P] [mobile] `mobile/src/components/Icon.js` : icônes SVG maison, aucun emoji
+- [ ] T021 [P] [mobile] `mobile/src/components/Ui.js` : composants communs, états vides et messages en français (FR-029, FR-032)
+- [ ] T022 [P] [mobile] `mobile/src/components/Crest.js` : écusson d'équipe
+- [ ] T023 [mobile] `mobile/src/api.js` : client REST, cache mémoire 60 s, repli AsyncStorage avec indicateur « données non à jour », `usePolling(15s)` actif au premier plan seulement (D6, FR-031)
+- [ ] T024 [mobile] `mobile/App.js` : navigation publique — 5 onglets et pile
 
-**Point de contrôle** : la base répond, l'API renvoie une route de test, l'app mobile démarre sur un écran vide thémé.
+**Point de contrôle** : la base répond, l'API renvoie une route, l'app démarre.
 
----
+## Phase 3 : US3 — Administrer la compétition (P1)
 
-## Phase 3 : US3 — Saisir et administrer la compétition (P1)
+Sans données saisies, les autres histoires n'ont rien à afficher.
 
-**Objectif** : les données réelles de la 6e édition peuvent être saisies. Sans
-cette phase, les autres histoires n'ont rien à afficher.
+- [ ] T025 [web] [US3] `admin/login.php` : session, CSRF, erreurs en français
+- [ ] T026 [web] [US3] Filtre d'autorisation par rôle en tête de chaque page — l'arbitre n'accède qu'à `live.php` (FR-025)
+- [ ] T027 [P] [web] [US3] `admin/assets/admin.css` : charte en variables CSS, boutons larges (principe IV)
+- [ ] T028 [P] [web] [US3] Sprite d'icônes SVG du back-office — aucun emoji
+- [ ] T029 [web] [US3] `admin/index.php` : tableau de bord — indicateurs, prochains matchs, classement
+- [ ] T030 [P] [web] [US3] `admin/teams.php` : les 10 équipes (FR-017)
+- [ ] T031 [P] [web] [US3] `admin/players.php` : effectifs, postes, numéros, licences (FR-018)
+- [ ] T032 [web] [US3] `admin/matches.php` : programmation des 9 journées et des tours de coupe (FR-003, FR-004)
+- [ ] T033 [web] [US3] CSRF vérifié sur **chaque** formulaire, échappement systématique en sortie (FR-027)
+- [ ] T034 [web] [US3] Créer les 3 compétitions et les comptes opérateurs par script SQL — `competitions.php` et `users.php` sont dans le lot 2
+- [ ] T035 [US3] Vérifier les scénarios C du `quickstart.md` : accès par rôle, rejet CSRF
 
-- [ ] T024 [web] [US3] `backend/public/admin/login.php` : connexion par session, jeton CSRF, message d'erreur en français
-- [ ] T025 [web] [US3] Filtre d'autorisation par rôle appliqué en tête de chaque page du back-office — l'arbitre n'accède qu'à `live.php` (FR-025, scénario US3-1)
-- [ ] T026 [P] [web] [US3] `backend/public/admin/assets/admin.css` : charte en variables CSS, boutons larges pour la saisie à une main (principe IV)
-- [ ] T027 [P] [web] [US3] Sprite d'icônes SVG du back-office — aucun emoji (principe III)
-- [ ] T028 [web] [US3] `backend/public/admin/index.php` : tableau de bord — indicateurs, prochains matchs, classement en direct
-- [ ] T029 [P] [web] [US3] `backend/public/admin/competitions.php` : création de compétition et engagement des équipes (FR-001, FR-002)
-- [ ] T030 [P] [web] [US3] `backend/public/admin/teams.php` : fiches d'équipe — nom, abréviation, quartier, couleurs, écusson, entraîneur (FR-017)
-- [ ] T031 [P] [web] [US3] `backend/public/admin/players.php` : effectifs, postes, numéros, licences (FR-018)
-- [ ] T032 [web] [US3] `backend/public/admin/matches.php` : programmation — date, heure, stade, arbitre, compétition, journée ou tour (FR-003, FR-004)
-- [ ] T033 [P] [web] [US3] `backend/public/admin/users.php` : comptes et rôles, condensats de mots de passe (FR-025, FR-028)
-- [ ] T034 [web] [US3] Jeton CSRF vérifié sur **chaque** formulaire du back-office, échappement systématique en sortie (FR-027, scénario US3-2)
-- [ ] T035 [web] [US3] Vérifier les scénarios C du `quickstart.md` : accès par rôle, rejet CSRF
+**Point de contrôle** : la compétition existe et s'administre.
 
-**Point de contrôle** : une compétition, deux équipes, deux effectifs et un match programmé existent et ressortent dans l'API.
+## Phase 4 : US1 + US8 — Le direct, saisi depuis le terrain (P1) — MVP
 
----
+C'est l'incrément qui justifie le produit.
 
-## Phase 4 : US1 — Suivre un match en direct (P1) 🎯 MVP
+### API
 
-**Objectif** : la chaîne complète saisie → API → mobile, en moins de 20 secondes.
-C'est l'incrément démontrable.
+- [ ] T036 [web] `POST /api/auth/login` : jeton et date d'expiration
+- [ ] T037 [web] `POST /api/matches/{id}/events` : ajoute l'événement et appelle `Score::recompute()` dans la même transaction ; `422` si le joueur n'est pas de l'équipe ou l'équipe pas du match (FR-007, FR-008)
+- [ ] T038 [web] [US8] Idempotence par `client_ref` sur cette route : un `client_ref` déjà vu renvoie `200` et l'événement existant, sans doublon (FR-041, écart E5)
+- [ ] T039 [web] `DELETE /api/matches/{id}/events/{eventId}` : correction et recalcul
+- [ ] T040 [web] `PATCH /api/matches/{id}` : statut, minute, affluence, arbitre, stade, tirs au but — interdiction d'écrire `home_score`/`away_score` (FR-010, invariant I1)
+- [ ] T041 [web] `GET /api/matches/{id}` : match, événements publiés, compositions, statistiques ; `no-cache` si `live` ou `halftime` (invariant I3)
+- [ ] T042 [web] `GET /api/matches?scope=upcoming|results` avec filtres
+- [ ] T043 [web] [US8] `GET /api/me/matches` : les matchs que l'opérateur connecté peut saisir, avec `lineups_ready` (FR-037)
+- [ ] T044 [web] [US8] `GET /api/matches/{id}/squads` : effectifs des deux équipes, joueurs actifs seulement (FR-038)
+- [ ] T045 [web] [US8] `PUT /api/matches/{id}/lineups` : composition d'une équipe, idempotent, `422` sur joueur étranger ou doublon (FR-038)
+- [ ] T046 [web] [US8] `PUT /api/matches/{id}/stats` : statistiques de rencontre, idempotent (FR-040)
+- [ ] T047 [web] Commande de vérification qui recalcule le score de tous les matchs et signale tout écart (invariant I1)
+- [ ] T048 [web] Journaliser les suppressions d'événements (écart E4)
 
-- [ ] T036 [web] [US1] `POST /api/auth/login` : renvoie un jeton et sa date d'expiration (`contracts/api.md`)
-- [ ] T037 [web] [US1] `POST /api/matches/{id}/events` : ajoute l'événement et appelle `Score::recompute()` dans la même transaction ; refuse en `422` un joueur hors de son équipe ou une équipe hors du match (FR-007, FR-008)
-- [ ] T038 [web] [US1] `DELETE /api/matches/{id}/events/{eventId}` : correction d'une saisie et recalcul (scénario US1-4)
-- [ ] T039 [web] [US1] `PATCH /api/matches/{id}` : statut, minute, affluence, arbitre, stade, tirs au but — interdiction absolue d'écrire `home_score` et `away_score` (FR-010, invariant I1)
-- [ ] T040 [web] [US1] `GET /api/matches/{id}` : match, fil d'événements publiés seulement, compositions, statistiques ; `Cache-Control: no-cache` si le match est `live` ou `halftime` (invariant I3)
-- [ ] T041 [web] [US1] `GET /api/matches?scope=upcoming|results` avec filtres `competition` et `team`
-- [ ] T042 [web] [US1] `backend/public/admin/live.php` : sélection du match, boutons d'événement (but, penalty, cartons, remplacement), minute, équipe, joueur, passeur ; score et classement recalculés automatiquement (FR-007, SC-004)
-- [ ] T043 [web] [US1] Écrire une commande de vérification qui recalcule le score de tous les matchs et signale tout écart (invariant I1)
-- [ ] T044 [web] [US1] Journaliser les suppressions d'événements pour rendre les corrections auditables (écart E4)
-- [ ] T045 [mobile] [US1] `mobile/src/screens/MatchScreen.js` : score live, fil d'événements, compositions, statistiques, rafraîchi toutes les 15 s (FR-009)
-- [ ] T046 [mobile] [US1] `mobile/src/screens/HomeScreen.js` : match en direct en tête, ou prochain match programmé ; raccourcis classement et meilleur buteur (scénarios US1-1 et US1-5)
-- [ ] T047 [mobile] [US1] Indicateur visuel de direct (`LiveDot`) et affichage de la minute de jeu
-- [ ] T048 [US1] Vérifier le scénario A du `quickstart.md` de bout en bout, chronomètre en main : but saisi visible en moins de 20 s (SC-001)
+### Espace opérateur mobile (US8)
 
-**Point de contrôle** : MVP démontrable — un match se suit en direct sur téléphone pendant qu'un opérateur le saisit.
+- [ ] T049 [mobile] [US8] Écran de connexion opérateur, cloisonné de la consultation publique — invisible pour un supporter sans compte (FR-036)
+- [ ] T050 [mobile] [US8] Stockage du jeton dans le stockage sécurisé de l'appareil, jamais en clair ; déconnexion à l'expiration (FR-042)
+- [ ] T051 [mobile] [US8] Écran « Mes matchs » : ce que l'opérateur peut saisir, avec l'état de préparation (FR-037)
+- [ ] T052 [mobile] [US8] **Avant le match** — composition des deux équipes, titulaires et remplaçants, choisis dans l'effectif (FR-038)
+- [ ] T053 [mobile] [US8] **Pendant le match** — coup d'envoi, minute, boutons d'événement (but, penalty, cartons, remplacement), équipe, joueur, passeur ; utilisable au pouce en une main (FR-039, SC-004)
+- [ ] T054 [mobile] [US8] Correction d'un événement saisi par erreur (FR-039, scénario US8-6)
+- [ ] T055 [mobile] [US8] File d'attente locale : une saisie hors réseau est conservée puis transmise au retour du réseau, avec son `client_ref` et sa minute d'origine (FR-041, scénario US8-5)
+- [ ] T056 [mobile] [US8] **Après le match** — affluence, statistiques de rencontre, clôture (FR-040, scénario US8-7)
+- [ ] T057 [web] [US1] `admin/live.php` : saisie live web, conservée comme filet de secours
 
----
+### Consultation publique
+
+- [ ] T058 [mobile] [US1] `MatchScreen.js` : score live, fil d'événements, compositions, statistiques, rafraîchi toutes les 15 s (FR-009)
+- [ ] T059 [mobile] [US1] `HomeScreen.js` : match en direct en tête, sinon prochain match ; raccourci classement (scénarios US1-1 et US1-5)
+- [ ] T060 [mobile] [US1] Indicateur visuel de direct et minute de jeu
+- [ ] T061 [US1] [US8] Recette de bout en bout, chronomètre en main : saisie depuis le mobile opérateur visible sur un second téléphone en moins de 20 s (SC-001)
+
+**Point de contrôle** : un match se suit en direct pendant qu'un commissaire le saisit depuis son téléphone.
 
 ## Phase 5 : US2 — Classement et calendrier (P1)
 
-**Objectif** : l'application a une valeur permanente entre deux matchs.
+Format arbitré (décision D11) : aller simple, 9 journées ; pas de barrages ; la
+seule zone du classement est la qualification aux quarts, sur les 8 premiers.
 
-⚠️ Les points ouverts FR-005 et FR-006 doivent être tranchés avant T051.
+- [ ] T062 [web] [US2] `GET /api/standings?competition={slug}` : `v_standings`, tri `points DESC, goal_diff DESC, goals_for DESC, name ASC` (FR-011, FR-012, D4)
+- [ ] T063 [web] [US2] `GET /api/competitions` (FR-001)
+- [ ] T064 [web] [US2] Seuil de qualification (8 premiers) porté par la configuration de la compétition, jamais codé en dur ; champ `zone` renseigné (FR-013)
+- [ ] T065 [P] [mobile] [US2] `StandingsScreen.js` : classement, zone de qualification distinguée
+- [ ] T066 [P] [mobile] [US2] `FixturesScreen.js` : calendrier et résultats, filtres par compétition (FR-004)
+- [ ] T067 [mobile] [US2] Statuts reporté et annulé visibles, exclus de tout classement (invariant I2)
+- [ ] T068 [US2] Vérifier le scénario B du `quickstart.md` : recalcul manuel identique à l'affichage (SC-003)
 
-- [ ] T049 [web] [US2] `GET /api/standings?competition={slug}` : lecture de `v_standings`, tri `points DESC, goal_diff DESC, goals_for DESC, name ASC`, rang calculé à la lecture (FR-011, FR-012, décision D4)
-- [ ] T050 [web] [US2] `GET /api/competitions` : les compétitions de la saison courante (FR-001)
-- [ ] T051 [web] [US2] Porter les seuils de qualification et de barrages dans la configuration de la compétition, et renseigner `zone` dans la réponse du classement (FR-013) — **dépend de l'arbitrage FR-005/FR-006**
-- [ ] T052 [P] [mobile] [US2] `mobile/src/screens/StandingsScreen.js` : classement complet, zones de qualification et de barrages distinguées visuellement (scénarios US2-1 et US2-2)
-- [ ] T053 [P] [mobile] [US2] `mobile/src/screens/FixturesScreen.js` : calendrier et résultats, filtres par compétition (scénario US2-3)
-- [ ] T054 [P] [mobile] [US2] `mobile/src/screens/CompetitionsScreen.js` : Championnat, Grand Prix Gabriel MBAÏROBÉ, Super Coupe
-- [ ] T055 [mobile] [US2] Afficher les statuts reporté et annulé dans le calendrier, exclus de tout classement (cas limite, invariant I2)
-- [ ] T056 [US2] Vérifier le scénario B du `quickstart.md` : recalcul manuel du classement identique à l'affichage (SC-003)
+## Phase 6 : US4 — Équipes et effectifs (P1 dans le lot 1)
 
----
+Réduit au nécessaire : savoir qui joue. La fiche joueur détaillée est en lot 2.
 
-## Phase 6 : US4 — Équipes et joueurs (P2)
+- [ ] T069 [web] [US4] `GET /api/teams` et `GET /api/teams/{id}` : équipe, effectif groupé par poste, position au classement (FR-019)
+- [ ] T070 [P] [mobile] [US4] `TeamsScreen.js` : les 10 équipes avec recherche par nom
+- [ ] T071 [P] [mobile] [US4] `SquadScreen.js` : effectif par poste
 
-- [ ] T057 [web] [US4] `GET /api/teams` et `GET /api/teams/{id}` : équipe, effectif groupé par poste, position au classement (FR-019)
-- [ ] T058 [web] [US4] `GET /api/players/{id}` : fiche et statistiques dérivées des événements, rattachées à `match_events.team_id` (FR-020, invariant I5)
-- [ ] T059 [web] [US4] Buts par journée d'un joueur, joints à `matches.matchday`
-- [ ] T060 [P] [mobile] [US4] `mobile/src/screens/TeamsScreen.js` : les 10 équipes avec recherche par nom (scénario US4-1)
-- [ ] T061 [P] [mobile] [US4] `mobile/src/screens/SquadScreen.js` : effectif par poste et indicateurs de l'équipe (scénario US4-2)
-- [ ] T062 [P] [mobile] [US4] `mobile/src/screens/PlayerScreen.js` : fiche joueur, statistiques, buts par journée (scénario US4-3)
-- [ ] T063 [US4] Vérifier qu'un but contre son camp compte au score de l'adversaire sans entrer dans les buts personnels du joueur
+## Phase 7 : Mise en service du lot 1
 
----
-
-## Phase 7 : US5 — Classements statistiques (P2)
-
-- [ ] T064 [web] [US5] `GET /api/stats/players?metric=goals|assists|cards` : agrégats sur `match_events` (FR-014, FR-016)
-- [ ] T065 [web] [US5] `GET /api/stats/teams` : attaque et défense depuis `v_standings`, possession depuis `match_team_stats`, affluence depuis `matches.attendance` (FR-015)
-- [ ] T066 [mobile] [US5] `mobile/src/screens/StatsScreen.js` : deux vues segmentées — joueurs (buteurs, passeurs, discipline) et équipes (attaque, défense, possession, affluence)
-- [ ] T067 [US5] Vérifier que le classement des buteurs correspond au décompte des événements `goal` et `penalty`
-
----
-
-## Phase 8 : US6 — Actualités et médias (P3)
-
-- [ ] T068 [P] [web] [US6] `backend/public/admin/news.php` : rédaction, brouillon, publication (FR-021)
-- [ ] T069 [P] [web] [US6] `backend/public/admin/media.php` : envoi de fichier (jpg, png, webp, mp4 ≤ 25 Mo) ou URL externe, contrôle d'extension et de taille avec message de refus en français (FR-022, scénario US3-4)
-- [ ] T070 [web] [US6] `GET /api/news`, `GET /api/news/{slug}` et `GET /api/media?type=` : contenus publiés uniquement (invariant I4)
-- [ ] T071 [web] [US6] `GET /api/about` : mission du GFC et contacts (FR-023)
-- [ ] T072 [P] [mobile] [US6] `mobile/src/screens/MediaScreen.js` : bascule photos et vidéos
-- [ ] T073 [P] [mobile] [US6] `mobile/src/screens/AboutScreen.js` : mission du GFC et contacts
-- [ ] T074 [mobile] [US6] Fil d'actualités sur l'accueil, les plus récentes d'abord
+- [ ] T072 Émettre le certificat SSL de `gfc.trugroup.cm` (AutoSSL / Let's Encrypt) — **bloquant** : sans lui l'application ne joint pas l'API
+- [ ] T073 Créer la base de production, importer `schema.sql`, renseigner `config/config.local.php` sur le serveur
+- [ ] T074 Premier déploiement via `deploy/deploy-ftp.sh`, puis vérifications d'après-déploiement de `DEPLOIEMENT.md`
+- [ ] T075 Régénérer le mot de passe FTP et celui du compte administrateur ; supprimer le compte de démonstration
+- [ ] T076 Saisir les données réelles : 10 équipes, effectifs complets, 9 journées du championnat (SC-007)
+- [ ] T077 Créer les comptes des opérateurs de saisie (commissaires, commentateurs, organisateurs)
+- [ ] T078 [P] Logo haute définition, icônes et écran de démarrage Android
+- [ ] T079 Construire et distribuer l'APK Android
+- [ ] T080 Vérifier tous les écrans du lot 1 en état chargement, vide et erreur (FR-032)
+- [ ] T081 Vérifier le scénario D du `quickstart.md` : navigation sans réseau (FR-031, SC-006)
+- [ ] T082 Vérifier l'affichage des horaires à l'heure de Garoua (cas limite)
+- [ ] T083 Exécuter les deux portes automatisées (SC-008, SC-009)
+- [ ] T084 Mesurer le premier contenu utile sur Android d'entrée de gamme en 3G — cible sous 3 s (SC-005)
+- [ ] T085 Répétition générale : un match de préparation saisi de bout en bout par l'opérateur qui officiera
 
 ---
 
-## Phase 9 : US7 — Notifications (P3)
+# LOT 2 — Complément
 
-- [ ] T075 [web] [US7] `POST /api/devices` : enregistrement d'un appareil, route publique, `201` à la création et `200` si déjà connu (FR-033)
-- [ ] T076 [web] [US7] Envoi vers Expo Push depuis PHP au coup d'envoi, à chaque but et au coup de sifflet final (décision D10)
-- [ ] T077 [mobile] [US7] Intégrer `expo-notifications` : demande d'autorisation et enregistrement au premier démarrage (scénario US7-1)
-- [ ] T078 [US7] Vérifier qu'un but saisi déclenche une notification portant le nouveau score (scénario US7-2)
+Livré pendant que l'édition se joue. Chaque phase est indépendante des autres.
 
----
+## Phase 8 : US4bis + US5 — Talents et statistiques (P2)
 
-## Phase 10 : Finition et mise en service
+C'est la mission « vulgariser les talents » rendue visible. Prend son sens après
+quelques journées jouées, d'où son placement en lot 2.
 
-- [ ] T079 Vérifier tous les écrans mobiles en état chargement, vide et erreur (FR-032)
-- [ ] T080 Vérifier le scénario D du `quickstart.md` : navigation sans réseau, dernier contenu servi avec indication (FR-031, SC-006)
-- [ ] T081 Vérifier que les horaires s'affichent à l'heure de Garoua quelle que soit la configuration de l'appareil (cas limite)
-- [ ] T082 Exécuter les deux portes automatisées : zéro emoji, zéro SQL concaténé (SC-008, SC-009)
-- [ ] T083 Mesurer le temps de premier contenu utile sur Android d'entrée de gamme en 3G — cible sous 3 s (SC-005)
-- [ ] T084 [P] Remplacer `mobile/assets/logo.png` et le logo du back-office par le logo haute définition, générer les icônes et l'écran de démarrage Android
-- [ ] T085 Saisir les données réelles de la 6e édition : 10 équipes, effectifs complets, calendrier (SC-007)
-- [ ] T086 Durcir la production : régénérer le condensat du compte administrateur, retirer le jeu de démonstration, servir `public/` comme racine web, variables `GFC_*` renseignées hors dépôt
-- [ ] T087 [P] Mettre à jour `backend/README.md` et `mobile/README.md` si une commande de démarrage ou le contrat d'API a changé
+- [ ] T086 [web] `GET /api/players/{id}` : fiche et statistiques dérivées des événements, rattachées à `match_events.team_id` (FR-020, invariant I5)
+- [ ] T087 [web] Buts par journée d'un joueur, joints à `matches.matchday`
+- [ ] T088 [web] `GET /api/stats/players?metric=goals|assists|cards` (FR-014, FR-016)
+- [ ] T089 [web] `GET /api/stats/teams` : attaque, défense, possession, affluence (FR-015)
+- [ ] T090 [P] [mobile] `PlayerScreen.js` : fiche joueur, statistiques, buts par journée
+- [ ] T091 [P] [mobile] `StatsScreen.js` : buteurs, passeurs, discipline / attaque, défense, possession, affluence
+- [ ] T092 Vérifier qu'un but contre son camp compte au score de l'adversaire sans entrer dans les buts personnels du joueur
+- [ ] T093 Vérifier que le classement des buteurs correspond au décompte des événements
+
+## Phase 9 : US6 — Contenus éditoriaux (P3)
+
+À n'activer que si quelqu'un publie régulièrement : un écran d'actualités vide
+fait plus de mal que pas d'écran.
+
+- [ ] T094 [P] [web] `admin/news.php` : rédaction, brouillon, publication (FR-021)
+- [ ] T095 [P] [web] `admin/media.php` : envoi (jpg, png, webp, mp4 ≤ 25 Mo) ou URL externe, contrôle d'extension et de taille (FR-022)
+- [ ] T096 [web] `GET /api/news`, `/api/news/{slug}`, `/api/media` : contenus publiés uniquement (invariant I4)
+- [ ] T097 [web] `GET /api/about` (FR-023)
+- [ ] T098 [P] [mobile] `MediaScreen.js` et `AboutScreen.js`
+- [ ] T099 [P] [mobile] `CompetitionsScreen.js` : les trois compétitions et leur format
+- [ ] T100 [mobile] Fil d'actualités sur l'accueil
+
+## Phase 10 : US7 — Notifications (P3)
+
+- [ ] T101 [web] `POST /api/devices` : enregistrement, `201` à la création, `200` si déjà connu (FR-033)
+- [ ] T102 [web] Envoi Expo Push au coup d'envoi, à chaque but et au coup de sifflet final (D10)
+- [ ] T103 [mobile] `expo-notifications` : autorisation et enregistrement au premier démarrage
+- [ ] T104 Vérifier qu'un but déclenche une notification portant le nouveau score
+
+## Phase 11 : Administration complète
+
+- [ ] T105 [P] [web] `admin/competitions.php` : création et engagement des équipes (FR-002)
+- [ ] T106 [P] [web] `admin/users.php` : comptes et rôles depuis l'interface (FR-025)
+- [ ] T107 [mobile] Recherche globale équipes et joueurs
+- [ ] T108 Arbitrer FR-035 (critère de qualification aux quarts) et le cas du vainqueur unique en Super Coupe, puis répercuter
 
 ---
 
 ## Dépendances
 
-- **Phase 1 → Phase 2** : l'arborescence et la configuration précèdent tout.
-- **Phase 2 → toutes les histoires** : bloquante. `Score.php` (T015) et `Auth.php` (T014) conditionnent US1 et US3 ; `api.js` (T022) conditionne tous les écrans.
-- **US3 (phase 3) → US1, US2, US4, US5** : sans données saisies, rien à afficher.
-- **US1 (phase 4) → US7** : les notifications se branchent sur les événements du direct.
-- **US2 (phase 5) → T051** : bloquée par l'arbitrage FR-005 / FR-006.
-- **US4 (phase 6) → US5 (phase 7)** : les statistiques réutilisent les agrégats de joueur.
-- Au sein d'une même histoire, l'API précède toujours l'écran qui la consomme (règle de la constitution).
+- **Phase 1 → 2 → tout le reste.** `Score.php` (T016) et `Auth.php` (T015) conditionnent US1, US3 et US8 ; `api.js` (T023) conditionne tous les écrans.
+- **US3 (phase 3) → US1, US8, US2, US4** : sans données saisies, rien à afficher.
+- **T036 à T046 (API) → T049 à T060 (écrans)** : l'API précède toujours l'écran qui la consomme (règle de la constitution).
+- **T038 (idempotence serveur) → T055 (file d'attente mobile)** : la file locale est inutilisable sans garantie côté serveur.
+- **T072 (certificat SSL) → T079 (APK)** : ne pas distribuer une application qui ne peut pas joindre l'API.
+- **Lot 1 complet → Lot 2.** La phase 10 dépend en plus du direct (phase 4).
 
 ## Parallélisation
 
-- T018 à T021 (thème, icônes, composants mobiles) sont indépendants entre eux et de tout le travail `web` — la branche `mobile` peut démarrer dès la phase 1.
-- T029 à T031 et T033 touchent des pages distinctes du back-office.
-- Une fois la route d'une histoire livrée, ses écrans mobiles marqués `[P]` se font en parallèle.
-- Les phases 6, 7 et 8 sont indépendantes les unes des autres une fois US3 terminée.
+- T019 à T022 (thème, icônes, composants) sont indépendants de tout le travail `web` : la branche `mobile` démarre dès la phase 1.
+- T030, T031 et les pages du back-office touchent des fichiers distincts.
+- Une fois l'API d'une histoire livrée, ses écrans marqués `[P]` se font en parallèle.
+- Dans le lot 2, les phases 8, 9, 10 et 11 sont indépendantes.
 
-## Périmètre livré par incrément
+## Ce qui est démontrable, et quand
 
-| Après la phase | Ce qui est démontrable |
+| Après | Démonstration |
 |---|---|
-| 3 (US3) | La compétition existe et s'administre |
-| 4 (US1) | **MVP** — un match se suit en direct sur téléphone |
-| 5 (US2) | Classement et calendrier complets |
-| 6-7 (US4, US5) | Talents et statistiques mis en avant |
-| 8-9 (US6, US7) | Contenus éditoriaux et rappels |
-| 10 | Prêt pour la 6e édition |
+| Phase 3 | La compétition s'administre |
+| Phase 4 | **MVP** — un match saisi au terrain depuis un téléphone, suivi en direct sur un autre |
+| Phase 6 | Le lot 1 est fonctionnellement complet |
+| Phase 7 | **Prêt pour le coup d'envoi** |
+| Phase 8 | Buteurs et fiches joueurs — les talents deviennent visibles |
+| Phases 9-11 | Contenus, notifications, administration complète |

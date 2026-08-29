@@ -177,6 +177,13 @@ compté dans les buts personnels du joueur au classement des buteurs.
   n'est pas couvert. Le recalcul du score doit se faire dans une transaction avec
   `SELECT ... FOR UPDATE` sur la ligne du match, afin qu'aucun événement
   simultané ne soit perdu ni compté deux fois.
+- **E5 — Idempotence des saisies mobiles.** L'espace opérateur mobile doit
+  pouvoir rejouer une saisie faite hors réseau (FR-041) sans créer de doublon.
+  Ajouter `match_events.client_ref` (CHAR(36), NULL) avec une contrainte
+  d'unicité sur `(match_id, client_ref)`. Une seconde transmission du même
+  `client_ref` renvoie l'événement existant au lieu d'en insérer un nouveau.
+  Sans cela, un réseau instable au bord du terrain produirait des buts comptés
+  deux fois.
 - **E4 — Journalisation des corrections.** La suppression d'un événement ne laisse
   aucune trace. Prévoir une suppression logique ou une table de journal, pour que
   la correction d'un score reste auditable — le principe II demande la

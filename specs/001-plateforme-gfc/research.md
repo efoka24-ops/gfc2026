@@ -156,22 +156,48 @@ hébergement mutualisé. La table `device_tokens` existe déjà.
 **Alternative écartée** : *Firebase Cloud Messaging en direct* — impose une
 configuration native et un compte de service, pour un gain nul à ce volume.
 
-## Points ouverts — hypothèses de travail
+## D11 — Format des compétitions *(arbitré)*
 
-Ces hypothèses tiennent jusqu'à arbitrage de l'organisation du GFC ; elles sont
-isolées dans la configuration de la compétition et non dans le code.
+**Décision** : arbitrage de l'organisation du GFC (Ferdinand TCHANG PALDOU),
+2026-08-29.
 
-- **FR-006, format du championnat** : aller simple entre les 10 équipes, soit
-  9 journées et 45 matchs, 3 points par victoire et 1 par nul.
-- **FR-005, Grand Prix Gabriel MBAÏROBÉ** : matchs secs à élimination directe
-  (quarts, demi-finales, finale) ; en cas d'égalité au temps réglementaire, tirs
-  au but, dont le résultat est enregistré séparément du score afin de ne pas
-  fausser la différence de buts.
-- **Super Coupe** : rencontre unique entre le vainqueur du championnat et celui du
-  Grand Prix.
+- **Championnat** : aller simple entre les 10 équipes, soit **9 journées et
+  45 matchs**, 3 points par victoire et 1 par nul, sans barrages.
+- **Grand Prix Gabriel MBAÏROBÉ** : élimination directe **à partir des quarts de
+  finale** — quarts, demi-finales, finale, soit **8 équipes et 7 matchs**. En cas
+  d'égalité, tirs au but, enregistrés séparément du score.
+- **Super Coupe** : **une rencontre unique**, vainqueur de la finale du Grand
+  Prix contre vainqueur du championnat.
 
-Le schéma couvre déjà les trois formats via `competitions.type`
-(`league` / `cup` / `supercup`), `matches.matchday`, `matches.round_label` et
-`competition_team.group_name` : un arbitrage différent modifie les données
-saisies, pas la structure. **Une colonne reste à ajouter** pour les tirs au but
-(voir `data-model.md`, écart E1).
+Soit **53 matchs** sur l'édition.
+
+**Conséquences sur le produit** :
+
+- La zone de barrages disparaît du classement. La seule zone à signaler est la
+  **qualification aux quarts de finale**, sur 8 des 10 équipes : les deux
+  dernières sont éliminées. Le champ `zone` du contrat d'API ne prend donc que
+  les valeurs `qualification` et `null` pour cette édition.
+- Le championnat étant en aller simple, chaque affiche ne se joue qu'une fois :
+  il n'y a pas de match retour à afficher sur une fiche d'équipe.
+- Les tirs au but ne concernent que le Grand Prix et la Super Coupe, jamais le
+  championnat.
+
+Le schéma absorbe les trois formats sans modification de structure :
+`competitions.type` (`league` / `cup` / `supercup`), `matches.matchday` pour les
+9 journées, `matches.round_label` pour « Quart de finale », « Demi-finale »,
+« Finale ». Seules les colonnes de tirs au but restent à ajouter
+(`data-model.md`, écart E1).
+
+## Points ouverts restants
+
+- **FR-035, qualification aux quarts** : le critère qui désigne les 8 équipes
+  qualifiées n'est pas arrêté. L'hypothèse de travail est **les 8 premiers du
+  championnat**, ce qui donne un sens sportif au classement et rend la zone de
+  qualification calculable automatiquement. Un tirage au sort ou un autre critère
+  ne changerait pas la structure, mais retirerait la zone de qualification du
+  classement.
+- **Super Coupe, vainqueur unique** : si la même équipe remporte le championnat
+  et le Grand Prix, l'adversaire de la Super Coupe doit être désigné autrement.
+  L'organisation doit trancher entre le finaliste du Grand Prix et le deuxième du
+  championnat. Sans arbitrage, la rencontre reste programmable à la main depuis
+  le back-office — le cas ne bloque donc aucun développement.

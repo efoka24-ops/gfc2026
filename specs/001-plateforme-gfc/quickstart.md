@@ -112,3 +112,17 @@ grep -rn --include=*.php -E "(SELECT|INSERT|UPDATE|DELETE).*(\\\$|\. *\\\$)" bac
 À vérifier en plus, à la main, sur chaque écran touché : état de chargement, état
 vide, état d'erreur ; aucune couleur ni police codée en dur hors de `theme.js`
 (mobile) ou des variables CSS (back-office).
+
+## Production
+
+L'installation de production est décrite dans `deploy/DEPLOIEMENT.md` sur la
+branche `web` : hébergement `gfc.trugroup.cm` (`/home/trugro9159/gfc`, Camoo),
+disposition des dossiers imposée par le confinement du compte FTP, script de
+transfert et vérifications d'après-déploiement.
+
+Deux points restent à régler avant l'ouverture au public :
+
+- émettre un certificat SSL couvrant `gfc.trugroup.cm` (AutoSSL ou Let's Encrypt
+  dans cPanel) — celui présenté aujourd'hui ne couvre pas le sous-domaine, ce qui
+  empêche l'application mobile de joindre l'API ;
+- régénérer le mot de passe FTP et celui du compte administrateur du back-office.
