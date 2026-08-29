@@ -11,12 +11,21 @@ npm install
 npx expo start
 ```
 
-L'URL de l'API se règle dans `app.json` → `expo.extra.apiUrl`.
-Sur émulateur Android, `localhost` du PC est `10.0.2.2`.
+L'URL de l'API se règle dans `app.json` → `expo.extra.apiUrl`. Elle pointe par
+défaut sur la production, **https://gfc.trugroup.cm/api**, servie depuis la
+branche `web` (voir `deploy/DEPLOIEMENT.md`).
+
+Pour développer contre une API locale, remplacer temporairement cette valeur —
+sur émulateur Android, `localhost` du poste est `10.0.2.2` — et **ne pas
+commiter** la modification :
 
 ```json
 "extra": { "apiUrl": "http://10.0.2.2:8000/api" }
 ```
+
+L'API de production est en HTTPS ; une URL en `http://` est refusée par Android
+sauf configuration explicite, ce qui est voulu : les jetons d'écriture ne doivent
+pas circuler en clair.
 
 ## Structure
 

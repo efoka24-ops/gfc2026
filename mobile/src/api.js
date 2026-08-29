@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE = Constants.expoConfig?.extra?.apiUrl ?? 'http://10.0.2.2:8000/api';
+const BASE = Constants.expoConfig?.extra?.apiUrl ?? 'https://gfc.trugroup.cm/api';
 const TTL = 60 * 1000; // cache mémoire court, l'app reste utilisable en réseau faible
 
 const memory = new Map();
