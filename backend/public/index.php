@@ -108,7 +108,7 @@ try {
                  (int) ($body['publish'] ?? 1), $user['id']]
             );
             require __DIR__ . '/../src/Score.php';
-            \Gfc\Score::recalculate($id);
+            \Gfc\Score::recompute($id);
             Response::json(Repo::match($id), 201);
 
         case count($seg) === 2 && $seg[0] === 'matches' && $method === 'PATCH':

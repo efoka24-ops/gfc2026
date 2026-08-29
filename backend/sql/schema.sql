@@ -72,10 +72,16 @@ CREATE TABLE matches (
   venue VARCHAR(120),
   referee VARCHAR(120),
   attendance INT DEFAULT NULL,
-  status ENUM('scheduled','live','halftime','finished','postponed') NOT NULL DEFAULT 'scheduled',
+  status ENUM('scheduled','live','halftime','finished','postponed','cancelled') NOT NULL DEFAULT 'scheduled',
   minute TINYINT UNSIGNED DEFAULT NULL,
+  -- Cache derive des evenements : recalcule par Score::recompute() dans la
+  -- transaction qui ecrit l'evenement. Aucun formulaire ne l'ecrit (invariant I1).
   home_score TINYINT UNSIGNED DEFAULT NULL,
   away_score TINYINT UNSIGNED DEFAULT NULL,
+  -- Tirs au but : departagent un tour du Grand Prix. N'entrent jamais dans
+  -- goals_for / goals_against de v_standings.
+  home_pens TINYINT UNSIGNED DEFAULT NULL,
+  away_pens TINYINT UNSIGNED DEFAULT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (competition_id) REFERENCES competitions(id) ON DELETE CASCADE,
   FOREIGN KEY (home_team_id) REFERENCES teams(id),
@@ -94,10 +100,15 @@ CREATE TABLE match_events (
   type ENUM('kickoff','goal','own_goal','penalty','penalty_missed','yellow','red','sub','halftime','fulltime','var') NOT NULL,
   detail VARCHAR(180),
   is_published TINYINT(1) NOT NULL DEFAULT 0,
+  -- Identifiant genere par l'appareil de l'operateur. Une saisie faite hors
+  -- reseau puis rejouee au retour de la connexion porte le meme client_ref :
+  -- l'unicite ci-dessous empeche qu'un but soit compte deux fois (FR-041).
+  client_ref CHAR(36) DEFAULT NULL,
   created_by INT DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (match_id) REFERENCES matches(id) ON DELETE CASCADE,
   FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE SET NULL,
+  UNIQUE KEY uniq_event_client_ref (match_id, client_ref),
   INDEX idx_events_match (match_id, minute)
 ) ENGINE=InnoDB;
 

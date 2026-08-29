@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user['id'],
             ]
         );
-        Score::recalculate($matchId);
+        Score::recompute($matchId);
     }
 
     if (($_POST['action'] ?? '') === 'status') {
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (($_POST['action'] ?? '') === 'delete_event') {
         Database::run('DELETE FROM match_events WHERE id = ? AND match_id = ?', [(int) $_POST['event_id'], $matchId]);
-        Score::recalculate($matchId);
+        Score::recompute($matchId);
     }
 
     header('Location: live.php?match=' . $matchId);
