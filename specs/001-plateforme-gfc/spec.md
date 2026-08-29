@@ -208,6 +208,50 @@ vérifier la réception de la notification sur l'appareil.
 
 ---
 
+### User Story 8 — Saisir un match depuis le téléphone (Priority: P1)
+
+Le commentateur, l'organisateur ou le commissaire du match se connecte à son
+espace dans l'application mobile. **Avant** la rencontre, il enregistre les
+compositions des deux équipes et confirme le stade et l'arbitre. **Pendant**, il
+donne le coup d'envoi et saisit chaque fait de jeu au fil du match — but,
+penalty, carton, remplacement — en quelques appuis. **Après**, il renseigne
+l'affluence et les statistiques de la rencontre, puis clôture le match.
+
+**Why this priority**: c'est l'outil que l'opérateur a réellement en main au bord
+du terrain. Le back-office web reste utilisable, mais personne ne saisit un match
+sur un ordinateur portable dans les gradins de Roumdé Adjia. Sans cet espace, le
+direct — la promesse produit — dépend d'un poste fixe qui n'existe pas sur place.
+
+**Independent Test**: se connecter avec un compte arbitre depuis l'application,
+saisir une composition, donner le coup d'envoi, enregistrer un but, clôturer le
+match, et vérifier sur un second téléphone en consultation publique que tout est
+apparu.
+
+**Acceptance Scenarios**:
+
+1. **Given** un opérateur muni d'un compte, **When** il se connecte depuis
+   l'application, **Then** il accède à son espace et n'y voit que les matchs
+   qu'il est autorisé à saisir.
+2. **Given** un supporter sans compte, **When** il utilise l'application,
+   **Then** la consultation reste entièrement accessible et l'espace opérateur
+   demeure invisible ou refusé.
+3. **Given** un opérateur sur un match à venir, **When** il enregistre la
+   composition d'une équipe, **Then** seuls les joueurs de l'effectif de cette
+   équipe lui sont proposés.
+4. **Given** un match en cours, **When** l'opérateur saisit un but, **Then**
+   l'événement part au serveur et le score se met à jour pour tous les
+   supporters dans les 20 secondes.
+5. **Given** une saisie effectuée alors que le réseau est coupé, **When** le
+   réseau revient, **Then** l'événement est transmis sans avoir été perdu ni
+   compté deux fois, et son horodatage reste celui de la minute saisie.
+6. **Given** un opérateur ayant saisi un événement par erreur, **When** il le
+   corrige depuis son espace, **Then** le score et les statistiques reviennent à
+   un état cohérent.
+7. **Given** un match terminé, **When** l'opérateur le clôture, **Then** le
+   classement du championnat intègre le résultat.
+
+---
+
 ### Edge Cases
 
 - **Réseau absent ou lent** : l'application affiche le dernier contenu connu
@@ -320,9 +364,9 @@ vérifier la réception de la notification sur l'appareil.
 
 **Comptes, rôles et sécurité**
 
-- **FR-024**: Le système DOIT authentifier les opérateurs du back-office par
-  identifiant et mot de passe, et l'application mobile ne DOIT exiger aucun
-  compte pour la consultation.
+- **FR-024**: Le système DOIT authentifier les opérateurs par identifiant et mot
+  de passe, aussi bien au back-office que dans l'espace opérateur de
+  l'application mobile. La **consultation** mobile ne DOIT exiger aucun compte.
 - **FR-025**: Le système DOIT appliquer trois rôles : administrateur (accès
   complet), secrétaire (contenus et saisie), arbitre (saisie live uniquement).
 - **FR-026**: Toute écriture par l'API DOIT exiger un jeton d'authentification à
@@ -343,6 +387,29 @@ vérifier la réception de la notification sur l'appareil.
   un état d'erreur explicites.
 - **FR-033**: Le système DOIT permettre l'enregistrement d'un appareil en vue des
   notifications de coup d'envoi, de but et de fin de match.
+
+**Espace opérateur mobile**
+
+- **FR-036**: L'application mobile DOIT offrir un espace opérateur accessible
+  après connexion, cloisonné de la consultation publique : un supporter sans
+  compte ne DOIT jamais y accéder ni le voir proposé comme une fonction du
+  produit.
+- **FR-037**: L'espace opérateur DOIT présenter à l'opérateur connecté la liste
+  des matchs qu'il peut saisir, et lui seul.
+- **FR-038**: L'opérateur DOIT pouvoir enregistrer, **avant** la rencontre, la
+  composition de chaque équipe — titulaires et remplaçants — en ne choisissant
+  que parmi les joueurs de l'effectif de l'équipe concernée.
+- **FR-039**: L'opérateur DOIT pouvoir, **pendant** la rencontre, donner le coup
+  d'envoi, ajuster la minute de jeu, saisir et corriger les événements, et
+  clôturer le match.
+- **FR-040**: L'opérateur DOIT pouvoir renseigner, **après** la rencontre,
+  l'affluence et les statistiques de la rencontre (possession, tirs, corners,
+  fautes, hors-jeu).
+- **FR-041**: Une saisie effectuée hors réseau DOIT être conservée sur l'appareil
+  et transmise dès le retour du réseau, sans perte ni double comptage, en
+  conservant la minute saisie.
+- **FR-042**: Le jeton de session de l'opérateur DOIT être stocké dans le
+  stockage sécurisé de l'appareil, jamais en clair, et DOIT expirer.
 
 ### Key Entities
 

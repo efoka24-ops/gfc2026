@@ -186,6 +186,74 @@ Met à jour `status`, `minute`, `attendance`, `referee`, `venue`, `home_pens`,
 (invariant I1). Rôles : `admin`, `secretaire`, `arbitre` (ce dernier limité à
 `status` et `minute`).
 
+### `GET /api/me/matches`
+
+Les matchs que l'opérateur connecté peut saisir, à venir et en cours. C'est
+l'écran d'accueil de l'espace opérateur mobile (FR-037).
+
+```json
+[{ "id": 42, "competition": { "slug": "championnat", "name": "Championnat" },
+   "matchday": 5, "home": { "id": 3, "name": "...", "abbr": "TON" },
+   "away": { "id": 7, "name": "...", "abbr": "DJA" },
+   "kickoff_at": "2026-08-29T16:00:00+01:00", "venue": "Stade Roumdé Adjia",
+   "status": "scheduled", "lineups_ready": false }]
+```
+
+`lineups_ready` indique si les deux compositions ont été enregistrées — l'espace
+opérateur s'en sert pour signaler ce qui reste à faire avant le coup d'envoi.
+
+### `GET /api/matches/{id}/squads`
+
+Les effectifs des deux équipes du match, pour composer. Ne renvoie que des
+joueurs actifs de chaque équipe, ce qui rend impossible d'aligner un joueur
+étranger à l'équipe (FR-038).
+
+```json
+{ "home": [{ "id": 51, "name": "...", "jersey_number": 9, "position": "ATT" }],
+  "away": [] }
+```
+
+### `PUT /api/matches/{id}/lineups`
+
+Enregistre la composition d'une équipe. Idempotent : le renvoi remplace
+intégralement la composition de cette équipe pour ce match.
+
+```json
+// requête
+{ "team_id": 3,
+  "players": [{ "player_id": 51, "is_starter": true },
+              { "player_id": 55, "is_starter": false }] }
+```
+
+Refus `422` si un joueur n'appartient pas à `team_id`, si `team_id` ne joue pas
+ce match, ou si un même joueur figure deux fois. Rôles : `admin`, `secretaire`,
+`arbitre`.
+
+### `PUT /api/matches/{id}/stats`
+
+Statistiques de la rencontre, saisies après le match (FR-040). Idempotent.
+
+```json
+{ "team_id": 3, "possession": 56, "shots": 12, "shots_on_target": 5,
+  "corners": 4, "fouls": 9, "offsides": 2 }
+```
+
+### Idempotence des événements
+
+Pour tenir FR-041 — une saisie faite hors réseau, transmise au retour de la
+connexion, ne doit être comptée qu'une fois — `POST /api/matches/{id}/events`
+accepte un champ `client_ref` : un identifiant unique généré par l'appareil.
+
+```json
+{ "type": "goal", "minute": 63, "team_id": 3, "player_id": 51,
+  "client_ref": "a3f1c9e2-..." }
+```
+
+Si un événement portant ce `client_ref` existe déjà pour ce match, le serveur
+renvoie `200` avec l'événement existant au lieu d'en créer un second. Sans ce
+mécanisme, un réseau instable produirait des doublons de buts — exactement ce que
+le principe II cherche à empêcher.
+
 ### `POST /api/devices`
 
 Enregistre un appareil pour les notifications. Route publique, sans jeton :
