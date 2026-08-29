@@ -1,6 +1,10 @@
 # Contrat de l'API REST — Plateforme GFC
 
-**Feature**: 001-plateforme-gfc | **Base**: `{GFC_BASE_URL}/api` | **Format**: JSON, `utf8mb4`
+**Feature**: 001-plateforme-gfc | **Format**: JSON, `utf8mb4`
+
+**Base** : `https://gfc.trugroup.cm/api` en production,
+`http://localhost:8000/api` en développement (`http://10.0.2.2:8000/api` depuis
+un émulateur Android). Voir `deploy/DEPLOIEMENT.md` sur la branche `web`.
 
 Ce document est le **seul lien** entre la branche `web` et la branche `mobile`.
 Toute évolution cassante doit être décrite ici avant d'être implémentée d'un côté

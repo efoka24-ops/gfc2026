@@ -18,6 +18,19 @@ Les branches de fonctionnalité partent de `web` ou de `mobile` selon leur
 périmètre. Une fonctionnalité qui touche les deux livre d'abord l'API, puis le
 mobile.
 
+## Hébergement
+
+La partie web est hébergée sur **https://gfc.trugroup.cm**
+(`/home/trugro9159/gfc`, Camoo) : l'API sur `/api`, le back-office sur
+`/admin/login.php`. C'est cette installation que consomme l'application mobile.
+Procédure de déploiement, script de transfert et vérifications :
+[`deploy/DEPLOIEMENT.md`](https://github.com/efoka24-ops/gfc2026/blob/web/deploy/DEPLOIEMENT.md)
+sur la branche `web`.
+
+Aucun identifiant — FTP, base de données, compte administrateur — n'est
+versionné : ils vivent dans `deploy/.env.deploy` et
+`backend/config/config.local.php`, tous deux ignorés par git.
+
 ## Documents de référence
 
 - [Constitution du projet](.specify/memory/constitution.md) — les cinq principes
