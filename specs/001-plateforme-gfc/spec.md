@@ -220,6 +220,10 @@ vérifier la réception de la notification sur l'appareil.
   buts.
 - **Égalité parfaite au classement** : l'ordre doit être déterministe et
   documenté (points, puis différence de buts, puis buts marqués).
+- **Même équipe vainqueur du championnat et du Grand Prix** : la Super Coupe
+  perd son opposition. Le système doit permettre de désigner l'adversaire
+  autrement (finaliste du Grand Prix ou deuxième du championnat) plutôt que de
+  programmer une rencontre d'une équipe contre elle-même.
 - **Joueur transféré entre deux équipes en cours d'édition** : ses statistiques
   doivent rester rattachées à l'équipe pour laquelle chaque événement a été
   marqué.
@@ -249,11 +253,19 @@ vérifier la réception de la notification sur l'appareil.
 - **FR-004**: Le système DOIT distinguer les statuts de match : programmé, en
   direct, terminé, reporté, annulé, et n'inclure dans les classements que les
   matchs terminés.
-- **FR-005**: Le format exact du Grand Prix Gabriel MBAÏROBÉ et de la Super Coupe
-  [NEEDS CLARIFICATION: nombre de tours, matchs aller-retour ou match sec,
-  critère de qualification depuis le championnat, gestion des tirs au but].
-- **FR-006**: Le format du championnat [NEEDS CLARIFICATION: aller simple ou
-  aller-retour entre les 10 équipes, nombre de journées, existence de barrages].
+- **FR-005**: Le Grand Prix Gabriel MBAÏROBÉ DOIT se dérouler à élimination
+  directe à partir des quarts de finale — quarts, demi-finales, finale, soit
+  8 équipes qualifiées et 7 matchs. Un tour ne peut pas se terminer sur un nul :
+  le système DOIT permettre d'enregistrer un résultat aux tirs au but, distinct
+  du score, qui désigne le qualifié sans entrer dans la différence de buts.
+- **FR-006**: Le championnat DOIT se jouer en aller simple entre les 10 équipes,
+  soit 9 journées et 45 matchs, à 3 points par victoire et 1 par match nul. Il
+  ne comporte pas de barrages.
+- **FR-034**: La Super Coupe DOIT opposer, en une rencontre unique, le vainqueur
+  de la finale du Grand Prix Gabriel MBAÏROBÉ au vainqueur du championnat.
+- **FR-035**: Le critère de qualification pour les quarts de finale du Grand Prix
+  [NEEDS CLARIFICATION: les 8 premiers du championnat, ou un tirage au sort, ou
+  un autre critère ?].
 
 **Direct et événements**
 

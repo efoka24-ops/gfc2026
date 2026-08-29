@@ -71,11 +71,25 @@ cd mobile && npm install && npx expo start
 
 Détail complet dans [quickstart.md](specs/001-plateforme-gfc/quickstart.md).
 
+## Format de la 6e édition
+
+Arbitré par l'organisation du GFC le 29 août 2026 :
+
+| Compétition | Format | Matchs |
+|---|---|---|
+| Championnat | aller simple entre les 10 équipes, 9 journées, 3 points par victoire | 45 |
+| Grand Prix Gabriel MBAÏROBÉ | élimination directe à partir des quarts, tirs au but en cas d'égalité | 7 |
+| Super Coupe | rencontre unique, vainqueur du Grand Prix contre champion | 1 |
+
+Soit 53 matchs. Pas de barrages : la seule zone signalée au classement est la
+qualification aux quarts, sur les 8 premières équipes.
+
 ## Points ouverts
 
-Deux formats de compétition restent à arbitrer avec l'organisation du GFC
-(FR-005 et FR-006 de la spécification) : le nombre de journées du championnat et
-le format exact du Grand Prix Gabriel MBAÏROBÉ. Les hypothèses de travail en
-vigueur sont documentées dans
-[research.md](specs/001-plateforme-gfc/research.md). Elles ne bloquent que la
-phase 5 du planning.
+- **Critère de qualification aux quarts** (FR-035) : l'hypothèse retenue est les
+  8 premiers du championnat ; à confirmer.
+- **Super Coupe si une même équipe gagne les deux** : l'adversaire reste à
+  désigner — finaliste du Grand Prix ou deuxième du championnat.
+
+Aucun des deux ne bloque le développement ; détail dans
+[research.md](specs/001-plateforme-gfc/research.md).

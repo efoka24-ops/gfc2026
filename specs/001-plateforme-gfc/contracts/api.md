@@ -77,7 +77,7 @@ répondre en moins de 300 ms et porter `Cache-Control: no-cache` tant que
 
 Classement calculé depuis `v_standings`, trié `points DESC, goal_diff DESC,
 goals_for DESC, name ASC`. Le rang est l'indice dans le tableau ; il n'est pas
-stocké. `zone` distingue les zones de qualification et de barrages.
+stocké. `zone` signale la qualification aux quarts de finale du Grand Prix.
 
 ```json
 [{ "rank": 1, "team": { "id": 3, "name": "...", "abbr": "TON", "logo": null, "color": "#7A1F30" },
@@ -86,9 +86,12 @@ stocké. `zone` distingue les zones de qualification et de barrages.
    "zone": "qualification" }]
 ```
 
-`zone` ∈ `qualification` | `barrage` | `null`. Les seuils dépendent des points
-ouverts FR-005/FR-006 et sont portés par la configuration de la compétition, pas
-par le code.
+`zone` ∈ `qualification` | `null`. Le championnat de la 6e édition ne comporte
+pas de barrages : la seule zone signalée est la qualification aux quarts de
+finale du Grand Prix, sur les 8 premières équipes des 10. Le seuil est porté par
+la configuration de la compétition, jamais codé en dur — une édition à 12 équipes
+ou un autre critère de qualification ne doit pas demander de modifier le code.
+La valeur `barrage` reste réservée pour une édition future.
 
 ### `GET /api/teams` et `GET /api/teams/{id}`
 

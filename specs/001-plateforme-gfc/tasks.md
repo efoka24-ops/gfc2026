@@ -111,12 +111,15 @@ C'est l'incrément démontrable.
 
 **Objectif** : l'application a une valeur permanente entre deux matchs.
 
-⚠️ Les points ouverts FR-005 et FR-006 doivent être tranchés avant T051.
+Format arbitré le 2026-08-29 : championnat en aller simple (9 journées, 45 matchs),
+Grand Prix à partir des quarts de finale (8 équipes, 7 matchs), Super Coupe en
+rencontre unique. Plus de barrages — la seule zone à signaler est la
+qualification aux quarts, sur les 8 premiers.
 
 - [ ] T049 [web] [US2] `GET /api/standings?competition={slug}` : lecture de `v_standings`, tri `points DESC, goal_diff DESC, goals_for DESC, name ASC`, rang calculé à la lecture (FR-011, FR-012, décision D4)
 - [ ] T050 [web] [US2] `GET /api/competitions` : les compétitions de la saison courante (FR-001)
-- [ ] T051 [web] [US2] Porter les seuils de qualification et de barrages dans la configuration de la compétition, et renseigner `zone` dans la réponse du classement (FR-013) — **dépend de l'arbitrage FR-005/FR-006**
-- [ ] T052 [P] [mobile] [US2] `mobile/src/screens/StandingsScreen.js` : classement complet, zones de qualification et de barrages distinguées visuellement (scénarios US2-1 et US2-2)
+- [ ] T051 [web] [US2] Porter le seuil de qualification (8 premiers) dans la configuration de la compétition et renseigner `zone` dans la réponse du classement — plus de zone de barrage (FR-013, décision D11) ; le critère exact reste suspendu à FR-035
+- [ ] T052 [P] [mobile] [US2] `mobile/src/screens/StandingsScreen.js` : classement complet, zone de qualification aux quarts distinguée visuellement (scénarios US2-1 et US2-2)
 - [ ] T053 [P] [mobile] [US2] `mobile/src/screens/FixturesScreen.js` : calendrier et résultats, filtres par compétition (scénario US2-3)
 - [ ] T054 [P] [mobile] [US2] `mobile/src/screens/CompetitionsScreen.js` : Championnat, Grand Prix Gabriel MBAÏROBÉ, Super Coupe
 - [ ] T055 [mobile] [US2] Afficher les statuts reporté et annulé dans le calendrier, exclus de tout classement (cas limite, invariant I2)
@@ -186,7 +189,7 @@ C'est l'incrément démontrable.
 - **Phase 2 → toutes les histoires** : bloquante. `Score.php` (T015) et `Auth.php` (T014) conditionnent US1 et US3 ; `api.js` (T022) conditionne tous les écrans.
 - **US3 (phase 3) → US1, US2, US4, US5** : sans données saisies, rien à afficher.
 - **US1 (phase 4) → US7** : les notifications se branchent sur les événements du direct.
-- **US2 (phase 5) → T051** : bloquée par l'arbitrage FR-005 / FR-006.
+- **US2 (phase 5)** : plus aucun blocage, le format a été arbitré (décision D11).
 - **US4 (phase 6) → US5 (phase 7)** : les statistiques réutilisent les agrégats de joueur.
 - Au sein d'une même histoire, l'API précède toujours l'écran qui la consomme (règle de la constitution).
 
