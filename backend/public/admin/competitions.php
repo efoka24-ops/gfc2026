@@ -42,7 +42,7 @@ ob_start(); ?>
 <div class="card">
   <h2>Nouvelle compétition</h2>
   <form method="post" class="grid" style="gap:14px">
-    <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+    <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
     <input type="hidden" name="action" value="create">
     <div class="grid c4">
       <label>Nom<input type="text" name="name" required></label>
@@ -76,7 +76,7 @@ ob_start(); ?>
 <div class="card">
   <h2>Engager une équipe</h2>
   <form method="post" class="grid c4" style="align-items:end">
-    <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+    <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
     <input type="hidden" name="action" value="engage">
     <label>Compétition
       <select name="competition_id"><?php foreach ($competitions as $c): ?><option value="<?= (int) $c['id'] ?>"><?= e($c['name']) ?></option><?php endforeach; ?></select>

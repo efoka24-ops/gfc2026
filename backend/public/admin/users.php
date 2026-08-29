@@ -28,7 +28,7 @@ ob_start(); ?>
 <div class="card">
   <h2>Nouvel utilisateur</h2>
   <form method="post" class="grid c4" style="align-items:end">
-    <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+    <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
     <label>Nom<input type="text" name="name" required></label>
     <label>E-mail<input type="email" name="email" required></label>
     <label>Mot de passe<input type="password" name="password" minlength="8" required></label>

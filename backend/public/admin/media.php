@@ -52,7 +52,7 @@ ob_start(); ?>
 <div class="card">
   <h2>Ajouter un média</h2>
   <form method="post" enctype="multipart/form-data" class="grid" style="gap:14px">
-    <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+    <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
     <div class="grid c4">
       <label>Type
         <select name="type"><option value="photo">Photo</option><option value="video">Vidéo</option></select>

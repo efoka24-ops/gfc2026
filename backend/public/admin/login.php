@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result) {
         $_SESSION['gfc_user']  = $result['user'];
         $_SESSION['gfc_token'] = $result['token'];
-        header('Location: index.php');
+        header('Location: ' . ($result['user']['role'] === Auth::ROLE_ARBITRE ? 'live.php' : 'index.php'));
         exit;
     }
     $error = 'Identifiants invalides.';
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <img src="assets/logo.png" alt="Garoua Football Challenge">
   <h1 style="margin:0;text-align:center;font:700 17px/1.2 sans-serif;color:#5A1424;text-transform:uppercase">Back-office GFC</h1>
   <?php if ($error): ?><div class="error"><?= e($error) ?></div><?php endif; ?>
-  <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+  <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
   <label>Adresse e-mail<input type="email" name="email" required autofocus></label>
   <label>Mot de passe<input type="password" name="password" required></label>
   <button class="btn" type="submit">Se connecter</button>

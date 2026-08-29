@@ -100,7 +100,7 @@ ob_start(); ?>
         <?= e($match['home_name']) ?> <?= (int) $match['home_score'] ?> – <?= (int) $match['away_score'] ?> <?= e($match['away_name']) ?></h2>
       <div class="right">
         <form method="post" class="grid c4" style="align-items:end;grid-template-columns:130px 90px auto">
-          <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+          <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
           <input type="hidden" name="action" value="status">
           <input type="hidden" name="match_id" value="<?= (int) $match['id'] ?>">
           <label>Statut
@@ -121,7 +121,7 @@ ob_start(); ?>
   <div class="card">
     <h2>Ajouter un événement</h2>
     <form method="post" class="grid" style="gap:16px">
-      <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+      <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
       <input type="hidden" name="action" value="event">
       <input type="hidden" name="match_id" value="<?= (int) $match['id'] ?>">
 
@@ -179,7 +179,7 @@ ob_start(); ?>
           <td><?= e($ev['team_abbr']) ?></td>
           <td>
             <form method="post" onsubmit="return confirm('Supprimer cet événement ?')">
-              <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+              <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
               <input type="hidden" name="action" value="delete_event">
               <input type="hidden" name="match_id" value="<?= (int) $match['id'] ?>">
               <input type="hidden" name="event_id" value="<?= (int) $ev['id'] ?>">

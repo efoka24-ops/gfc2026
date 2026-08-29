@@ -26,7 +26,7 @@ ob_start(); ?>
 <div class="card">
   <h2>Publier une actualité</h2>
   <form method="post" class="grid" style="gap:14px">
-    <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+    <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
     <div class="grid c2">
       <label>Titre<input type="text" name="title" required maxlength="200"></label>
       <label>Catégorie

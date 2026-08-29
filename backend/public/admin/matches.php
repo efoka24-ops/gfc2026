@@ -40,7 +40,7 @@ ob_start(); ?>
 <div class="card">
   <h2>Programmer un match</h2>
   <form method="post" class="grid" style="gap:14px">
-    <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+    <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
     <div class="grid c4">
       <label>Compétition
         <select name="competition_id" required>

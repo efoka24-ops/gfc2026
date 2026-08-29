@@ -4,7 +4,7 @@ use Gfc\Auth;
 use Gfc\Database;
 use Gfc\Repo;
 
-$user   = Auth::requireSession();
+$user   = Auth::requireSession([Auth::ROLE_ADMIN, Auth::ROLE_SECRETAIRE]);
 $title  = 'Tableau de bord';
 $active = 'index.php';
 $season = (int) $config['app']['current_season'];

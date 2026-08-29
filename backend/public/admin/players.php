@@ -37,7 +37,7 @@ ob_start(); ?>
 <div class="card">
   <h2>Nouveau joueur</h2>
   <form method="post" class="grid c4" style="align-items:end">
-    <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+    <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
     <label>Équipe
       <select name="team_id" required>
         <?php foreach ($teams as $t): ?><option value="<?= (int) $t['id'] ?>" <?= $teamId === (int) $t['id'] ? 'selected' : '' ?>><?= e($t['name']) ?></option><?php endforeach; ?>

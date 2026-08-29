@@ -28,7 +28,7 @@ ob_start(); ?>
 <div class="card">
   <h2>Nouvelle équipe</h2>
   <form method="post" class="grid c4" style="align-items:end">
-    <input type="hidden" name="csrf" value="<?= csrf_token() ?>">
+    <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">
     <label>Nom<input type="text" name="name" required></label>
     <label>Abréviation<input type="text" name="abbr" maxlength="5" required></label>
     <label>Quartier<input type="text" name="quarter"></label>

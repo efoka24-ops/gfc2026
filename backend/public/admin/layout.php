@@ -1,16 +1,30 @@
 <?php
 /** @var array $user  @var string $title  @var string $active */
-$nav = [
-    'index.php'        => 'Tableau de bord',
-    'competitions.php' => 'Compétitions',
-    'teams.php'        => 'Équipes',
-    'players.php'      => 'Joueurs',
-    'matches.php'      => 'Matchs & calendrier',
-    'live.php'         => 'Saisie live',
-    'news.php'         => 'Actualités',
-    'media.php'        => 'Photos & vidéos',
-    'users.php'        => 'Utilisateurs & rôles',
+/**
+ * Navigation filtrée par rôle.
+ *
+ * Chaque page vérifie déjà ses propres droits ; ce filtre existe pour que la
+ * barre ne propose pas des liens qui finiront en « accès refusé ». Un arbitre
+ * ne doit voir que ce qu'il peut faire : la saisie live.
+ */
+$navComplete = [
+    'index.php'        => ['Tableau de bord',      ['admin', 'secretaire']],
+    'competitions.php' => ['Compétitions',         ['admin', 'secretaire']],
+    'teams.php'        => ['Équipes',              ['admin', 'secretaire']],
+    'players.php'      => ['Joueurs',              ['admin', 'secretaire']],
+    'matches.php'      => ['Matchs & calendrier',  ['admin', 'secretaire']],
+    'live.php'         => ['Saisie live',          ['admin', 'secretaire', 'arbitre']],
+    'news.php'         => ['Actualités',           ['admin', 'secretaire']],
+    'media.php'        => ['Photos & vidéos',      ['admin', 'secretaire']],
+    'users.php'        => ['Utilisateurs & rôles', ['admin']],
 ];
+
+$nav = [];
+foreach ($navComplete as $href => [$label, $roles]) {
+    if (in_array($user['role'], $roles, true)) {
+        $nav[$href] = $label;
+    }
+}
 ?><!DOCTYPE html>
 <html lang="fr">
 <head>
