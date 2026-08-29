@@ -11,15 +11,36 @@ mysql -u root -p < sql/seed.sql          # données d'exemple, à remplacer
 cd backend && php -S localhost:8000 -t public
 ```
 
-Variables d'environnement (ou édition directe de `config/config.php`) :
-`GFC_DB_HOST`, `GFC_DB_NAME`, `GFC_DB_USER`, `GFC_DB_PASS`, `GFC_BASE_URL`.
+Variables d'environnement en développement : `GFC_DB_HOST`, `GFC_DB_NAME`,
+`GFC_DB_USER`, `GFC_DB_PASS`, `GFC_BASE_URL`.
 
 Compte de démonstration : `admin@gfc.cm` / `gfc2026`.
 **Régénérez le hash en production** :
 `php -r "echo password_hash('votre-mot-de-passe', PASSWORD_DEFAULT);"`
 
-En production, servez `public/` comme racine web (Apache : le `.htaccess` est fourni ;
-Nginx : `try_files $uri /index.php?$query_string;`).
+## Production — gfc.trugroup.cm
+
+L'installation de production vit sur `/home/trugro9159/gfc` et répond sur
+<https://gfc.trugroup.cm> : API sur `/api`, back-office sur `/admin/login.php`.
+C'est cette installation que consomme l'application mobile.
+
+Le compte FTP y étant confiné au dossier qui sert aussi de racine web, `public/`
+ne peut pas être la racine : l'arborescence `backend/` est déployée telle quelle
+et le `.htaccess` racine redirige tout le trafic vers `public/`, tandis que
+`config/`, `src/` et `sql/` sont refusés par HTTP via leur propre `.htaccess`.
+
+Les identifiants de production se placent dans `config/config.local.php` (copie
+de `config/config.local.example.php`), créé **sur le serveur** et ignoré par git.
+Ce fichier prime sur les variables d'environnement, que les hébergements
+mutualisés n'exposent pas de manière fiable au processus PHP.
+
+Procédure complète, script de transfert et vérifications d'après-déploiement :
+[`deploy/DEPLOIEMENT.md`](../deploy/DEPLOIEMENT.md).
+
+Sur un hébergement où `public/` peut être la racine web, servez-le directement
+(Apache : le `.htaccess` de `public/` suffit ; Nginx :
+`try_files $uri /index.php?$query_string;`) et le `.htaccess` racine devient
+inutile.
 
 ## API — lecture publique
 

@@ -1,0 +1,6 @@
+# Ce dossier ne doit jamais etre servi par HTTP.
+Require all denied
+<IfModule !mod_authz_core.c>
+  Order deny,allow
+  Deny from all
+</IfModule>

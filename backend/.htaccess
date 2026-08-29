@@ -1,0 +1,19 @@
+# Racine web du sous-domaine gfc.trugroup.cm  ->  /home/trugro9159/gfc
+#
+# Sur cet hebergement mutualise, le compte FTP est confine au dossier qui sert
+# aussi de racine web : impossible de placer src/ et config/ au-dessus d'elle.
+# On redirige donc tout le trafic vers public/, et les dossiers sensibles sont
+# rendus inaccessibles par leur propre .htaccess (defense en profondeur).
+
+RewriteEngine On
+
+# HTTPS obligatoire : l'API transporte des jetons d'ecriture.
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Tout passe par public/, sans jamais l'exposer dans l'URL.
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ public/$1 [L]
+
+# Pas de listing de repertoire.
+Options -Indexes
