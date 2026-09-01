@@ -13,3 +13,5 @@
 Thumbs.db
 /setup.ps1
 /create-laravel.ps1
+
+*.ps1
