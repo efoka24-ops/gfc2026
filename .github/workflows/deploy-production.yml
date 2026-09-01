@@ -66,10 +66,10 @@ jobs:
           # Copier vendor (déjà optimisé)
           cp -r api/vendor deploy-package/vendor
           
-          # Créer .env depuis .env.production
-          if [ -f api/.env.production ]; then
-            cp api/.env.production deploy-package/.env
-          fi
+          # Créer .env depuis .env.production.example avec les vraies valeurs
+          cp api/.env.production.example deploy-package/.env
+          
+          # Note: APP_KEY sera généré par le webhook deploy-webhook.php
           
           # Copier dashboard web compilé
           mkdir -p deploy-package/public/dashboard
@@ -78,6 +78,11 @@ jobs:
           # Copier script d'installation
           if [ -f setup-web.php ]; then
             cp setup-web.php deploy-package/
+          fi
+          
+          # Copier webhook de déploiement
+          if [ -f deploy-webhook.php ]; then
+            cp deploy-webhook.php deploy-package/
           fi
           
       - name: 📤 Deploy via FTP
