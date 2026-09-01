@@ -16,7 +16,7 @@ export default function LoginPage() {
     try {
       const { data } = await authApi.login(email, password)
       localStorage.setItem('gfc_token', data.token)
-      navigate('/dashboard')
+      navigate('/')
     } catch (err: any) {
       setError(err.response?.data?.message ?? 'Identifiants incorrects.')
     } finally {
@@ -32,11 +32,7 @@ export default function LoginPage() {
       <div style={{ width: '100%', maxWidth: 400, padding: '0 24px' }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <svg width="64" height="64" viewBox="0 0 447 447" style={{ display: 'block', margin: '0 auto 16px' }}>
-            <rect width="447" height="447" rx="24" fill="#5A1424"/>
-            <rect x="91.5" y="85" width="264" height="264" fill="#E8752A"/>
-            <rect x="115.5" y="267" width="216" height="28" rx="14" fill="#FFF"/>
-          </svg>
+          <img src="/logo.png" alt="GFC Logo" style={{ display: 'block', margin: '0 auto 16px', width: 120, height: 120, borderRadius: 16 }} />
           <h1 style={{ color: '#fff', fontSize: 32, marginBottom: 4 }}>GFC 2026</h1>
           <p style={{ color: 'var(--orange-soft)', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
             Administration
