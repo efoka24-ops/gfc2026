@@ -1,16 +1,39 @@
-node_modules/
-.expo/
-.expo-shared/
-dist/
+# Laravel backend
+/api/vendor/
+/api/node_modules/
+/api/.env
+/api/storage/*.key
+
+# Web dashboard
+/web/node_modules/
+/web/dist/
+
+# Mobile app
+/mobile/node_modules/
+/mobile/.expo/
+/mobile/.expo-shared/
+/mobile/android/
+/mobile/ios/
+
+# Logs
 *.log
 npm-debug.log*
 yarn-error.log*
+
+# Environment
 .env
 .env.*
-backend/config/config.local.php
-backend/public/uploads/*
-!backend/public/uploads/.gitkeep
+
+# System files
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
+
+# PowerShell scripts (may contain credentials)
+*.ps1
+
+# Legacy backend paths
+backend/config/config.local.php
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep

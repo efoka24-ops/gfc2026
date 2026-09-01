@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Garoua Football Challenge",
+    "slug": "garoua-football-challenge",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#5A1424"
+    },
+    "android": {
+      "package": "cm.gfc.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#5A1424"
+      }
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "cm.gfc.app"
+    },
+    "extra": {
+      "apiUrl": "https://gfc.camoo.hosting/api",
+      "pusherKey": "",
+      "pusherCluster": "mt1",
+      "eas": {
+        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+      }
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-notifications"
+    ]
+  }
+}
