@@ -1,0 +1,15 @@
+/api/vendor/
+/api/node_modules/
+/api/.env
+/api/storage/*.key
+/web/node_modules/
+/web/dist/
+/mobile/node_modules/
+/mobile/.expo/
+/mobile/android/
+/mobile/ios/
+*.log
+.DS_Store
+Thumbs.db
+/setup.ps1
+/create-laravel.ps1
