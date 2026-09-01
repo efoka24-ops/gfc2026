@@ -12,6 +12,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(GfcSeeder::class);
+        $this->call([
+            GfcSeeder::class,
+            CompetitionSeeder::class,
+        ]);
     }
 }
