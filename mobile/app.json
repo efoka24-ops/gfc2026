@@ -23,7 +23,7 @@
       "bundleIdentifier": "cm.gfc.app"
     },
     "extra": {
-      "apiUrl": "https://gfc.camoo.hosting/api",
+      "apiUrl": "http://10.0.2.2:8000/api",
       "pusherKey": "",
       "pusherCluster": "mt1",
       "eas": {
