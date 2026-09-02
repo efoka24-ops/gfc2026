@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import logoImg from "@/imports/1783702209636.png";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ function Ico({ n, s = 16 }: { n: string; s?: number }) {
   );
 }
 
-const TEAMS = [
+const DEMO_TEAMS = [
   {
     id: 1, name: "Étoile du Nord", short: "EDN", tier: "top",
     pts: 16, j: 6, g: 5, n: 1, p: 0, bp: 14, bc: 4,
@@ -115,7 +115,7 @@ const TEAMS = [
   },
 ];
 
-const MATCHES = [
+const DEMO_MATCHES = [
   { id: 1, date: "Sam 2 Août", time: "16:00", home: "Étoile du Nord", away: "Lions de Garoua", homeScore: 2, awayScore: 1, status: "done", competition: "Grand Prix Mbaïrobé" },
   { id: 2, date: "Sam 2 Août", time: "18:30", home: "FC Bénoué", away: "Diamants FC", homeScore: 1, awayScore: 1, status: "live", competition: "Championnat" },
   { id: 3, date: "Dim 3 Août", time: "16:00", home: "Tornado Ngaoundéré", away: "United Pitoa", homeScore: null, awayScore: null, status: "upcoming", competition: "Championnat" },
@@ -123,7 +123,7 @@ const MATCHES = [
   { id: 5, date: "Lun 4 Août", time: "17:00", home: "Racing Garoua", away: "FC Figuil", homeScore: null, awayScore: null, status: "upcoming", competition: "Super Coupe" },
 ];
 
-const PLAYERS = [
+const DEMO_PLAYERS = [
   { id: 1, name: "Adamou Maïga", team: "Étoile du Nord", pos: "ATT", goals: 7, assists: 3, img: "photo-1519032284022-0fdfbdb3c42e" },
   { id: 2, name: "Bello Hamadou", team: "Lions de Garoua", pos: "MIL", goals: 4, assists: 6, img: "photo-1652665314612-c48e10a01598" },
   { id: 3, name: "Moussa Djibrine", team: "FC Bénoué", pos: "ATT", goals: 5, assists: 2, img: "photo-1722978687695-212eecfa4cbe" },
@@ -132,13 +132,128 @@ const PLAYERS = [
 
 // ── Team color helper ─────────────────────────────────────────────────────────
 
-function teamColorBg(team: typeof TEAMS[0]) {
+// ── Donnees live (API) avec repli sur les donnees de demonstration ──────────────
+//
+// L'application est branchee sur l'API de gfc.trugroup.cm. Chaque jeu de donnees
+// est mappe vers la forme EXACTE attendue par le design ; si l'API est vide ou
+// injoignable, on retombe proprement sur les donnees de demonstration ci-dessus.
+// URL racine-relative (/api) : herite du protocole de la page (http ou https).
+
+const API = "/api";
+async function j(path: string): Promise<any[]> {
+  try {
+    const r = await fetch(API + path, { headers: { Accept: "application/json" } });
+    if (!r.ok) return [];
+    const d = await r.json();
+    return Array.isArray(d) ? d : (Array.isArray(d?.standings) ? d.standings : []);
+  } catch { return []; }
+}
+
+const POS: Record<string, string> = { FWD: "ATT", MID: "MIL", DEF: "DEF", GK: "GB" };
+
+function mapStandingsToTeams(rows: any[]): typeof DEMO_TEAMS {
+  return rows.map((r, i) => {
+    const t = r.team || {};
+    const primary = t.primary_color || "#7a1c2a";
+    const name = t.name || "—";
+    return {
+      id: t.id ?? r.team_id ?? i + 1,
+      name,
+      short: String(t.short_name || name.slice(0, 3)).toUpperCase(),
+      tier: i < 3 ? "top" : i < 7 ? "mid" : "low",
+      pts: r.points ?? 0, j: r.played ?? 0, g: r.won ?? 0, n: r.drawn ?? 0, p: r.lost ?? 0,
+      bp: r.goals_for ?? 0, bc: r.goals_against ?? 0,
+      coach: t.coach || "—", founded: t.founded_year || 0, city: t.city || "Garoua",
+      colors: [primary, "#1a0c0e"],
+      players: [] as string[], trophies: [] as string[],
+      desc: "",
+    };
+  }) as any;
+}
+
+function mapTeams(rows: any[]): typeof DEMO_TEAMS {
+  return rows.map((t, i) => {
+    const primary = t.primary_color || "#7a1c2a";
+    const name = t.name || "—";
+    return {
+      id: t.id ?? i + 1, name,
+      short: String(t.short_name || name.slice(0, 3)).toUpperCase(),
+      tier: "mid", pts: 0, j: 0, g: 0, n: 0, p: 0, bp: 0, bc: 0,
+      coach: t.coach || "—", founded: t.founded_year || 0, city: t.city || "Garoua",
+      colors: [primary, "#1a0c0e"], players: [] as string[], trophies: [] as string[], desc: "",
+    };
+  }) as any;
+}
+
+function mapMatches(rows: any[], compName: Record<number, string>): typeof DEMO_MATCHES {
+  return rows.map((m) => {
+    const dt = m.scheduled_at ? new Date(m.scheduled_at) : null;
+    const status = m.status === "finished" ? "done"
+      : (m.status === "live" || m.status === "half_time") ? "live" : "upcoming";
+    return {
+      id: m.id,
+      date: dt ? dt.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }) : "",
+      time: dt ? dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "",
+      home: m.home_team?.name || "—",
+      away: m.away_team?.name || "—",
+      homeScore: m.home_score ?? null,
+      awayScore: m.away_score ?? null,
+      status,
+      competition: compName[m.competition_id] || m.matchday?.label || "GFC",
+    };
+  }) as any;
+}
+
+function mapPlayers(rows: any[]): typeof DEMO_PLAYERS {
+  return rows.map((p) => ({
+    id: p.id,
+    name: [p.first_name, p.last_name].filter(Boolean).join(" ") || "—",
+    team: p.team?.name || "",
+    pos: POS[p.position] || p.position || "",
+    goals: p.goals ?? 0,
+    assists: p.assists ?? 0,
+    img: DEMO_PLAYERS[0].img,
+  })) as any;
+}
+
+type LiveData = { TEAMS: typeof DEMO_TEAMS; MATCHES: typeof DEMO_MATCHES; PLAYERS: typeof DEMO_PLAYERS };
+const LiveContext = createContext<LiveData>({ TEAMS: DEMO_TEAMS, MATCHES: DEMO_MATCHES, PLAYERS: DEMO_PLAYERS });
+const useLive = () => useContext(LiveContext);
+
+function LiveProvider({ children }: { children: any }) {
+  const [data, setData] = useState<LiveData>({ TEAMS: DEMO_TEAMS, MATCHES: DEMO_MATCHES, PLAYERS: DEMO_PLAYERS });
+  useEffect(() => {
+    let on = true;
+    (async () => {
+      const [standings, teams, matches, comps, players] = await Promise.all([
+        j("/standings"), j("/teams"), j("/matches"), j("/competitions"), j("/players"),
+      ]);
+      const compName: Record<number, string> = {};
+      comps.forEach((c: any) => { compName[c.id] = c.name; });
+
+      const liveTeams = standings.length ? mapStandingsToTeams(standings)
+        : teams.length ? mapTeams(teams) : DEMO_TEAMS;
+      const liveMatches = matches.length ? mapMatches(matches, compName) : DEMO_MATCHES;
+      const livePlayers = players.length ? mapPlayers(players) : DEMO_PLAYERS;
+
+      if (on) setData({
+        TEAMS: liveTeams.length ? liveTeams : DEMO_TEAMS,
+        MATCHES: liveMatches.length ? liveMatches : DEMO_MATCHES,
+        PLAYERS: livePlayers.length ? livePlayers : DEMO_PLAYERS,
+      });
+    })();
+    return () => { on = false; };
+  }, []);
+  return <LiveContext.Provider value={data}>{children}</LiveContext.Provider>;
+}
+
+function teamColorBg(team: typeof DEMO_TEAMS[0]) {
   return team.colors[0];
 }
 
 // ── Team Drawer ───────────────────────────────────────────────────────────────
 
-function TeamDrawer({ team, onClose }: { team: typeof TEAMS[0]; onClose: () => void }) {
+function TeamDrawer({ team, onClose }: { team: typeof DEMO_TEAMS[0]; onClose: () => void }) {
   const tierLabel = team.tier === "top" ? "Zone Qualif." : team.tier === "mid" ? "Milieu" : "Bas de tableau";
   const tierColor = team.tier === "top" ? "#e8720c" : team.tier === "mid" ? "#7a1c2a" : "#888";
 
@@ -307,7 +422,7 @@ function LiveBadge() {
   );
 }
 
-function MatchCard({ match }: { match: typeof MATCHES[0] }) {
+function MatchCard({ match }: { match: typeof DEMO_MATCHES[0] }) {
   const isLive = match.status === "live";
   const isDone = match.status === "done";
   return (
@@ -341,7 +456,7 @@ function MatchCard({ match }: { match: typeof MATCHES[0] }) {
   );
 }
 
-function PlayerCard({ player }: { player: typeof PLAYERS[0] }) {
+function PlayerCard({ player }: { player: typeof DEMO_PLAYERS[0] }) {
   return (
     <div className="rounded-xl overflow-hidden border" style={{ background: "var(--card)", borderColor: "var(--border)" }}>
       <div className="relative h-40 bg-gray-200">
@@ -374,6 +489,7 @@ function PlayerCard({ player }: { player: typeof PLAYERS[0] }) {
 // ── Pages ─────────────────────────────────────────────────────────────────────
 
 function HomePage({ setPage }: { setPage: (p: string) => void }) {
+  const { MATCHES } = useLive();
   const liveMatch = MATCHES.find((m) => m.status === "live");
   const upcoming = MATCHES.filter((m) => m.status === "upcoming").slice(0, 2);
 
@@ -480,6 +596,7 @@ function HomePage({ setPage }: { setPage: (p: string) => void }) {
 }
 
 function MatchesPage() {
+  const { MATCHES } = useLive();
   const [filter, setFilter] = useState<"all" | "live" | "upcoming" | "done">("all");
   const tabs = [
     { key: "all", label: "Tous" },
@@ -515,7 +632,8 @@ function MatchesPage() {
   );
 }
 
-function StandingsPage({ onTeamClick }: { onTeamClick: (t: typeof TEAMS[0]) => void }) {
+function StandingsPage({ onTeamClick }: { onTeamClick: (t: typeof DEMO_TEAMS[0]) => void }) {
+  const { TEAMS } = useLive();
   return (
     <div className="pb-6">
       <div className="px-4 pt-2 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
@@ -563,6 +681,7 @@ function StandingsPage({ onTeamClick }: { onTeamClick: (t: typeof TEAMS[0]) => v
 }
 
 function PlayersPage() {
+  const { PLAYERS } = useLive();
   return (
     <div className="pb-6">
       <div className="px-4 pt-2 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
@@ -600,7 +719,8 @@ function PlayersPage() {
   );
 }
 
-function TeamsPage({ onTeamClick }: { onTeamClick: (t: typeof TEAMS[0]) => void }) {
+function TeamsPage({ onTeamClick }: { onTeamClick: (t: typeof DEMO_TEAMS[0]) => void }) {
+  const { TEAMS } = useLive();
   return (
     <div className="pb-6">
       <div className="px-4 pt-2 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
@@ -720,9 +840,9 @@ const NAV_ITEMS = [
 
 // ── App Shell ─────────────────────────────────────────────────────────────────
 
-export default function App() {
+function AppInner() {
   const [page, setPage] = useState<string>("home");
-  const [drawerTeam, setDrawerTeam] = useState<typeof TEAMS[0] | null>(null);
+  const [drawerTeam, setDrawerTeam] = useState<typeof DEMO_TEAMS[0] | null>(null);
 
   return (
     <div className="size-full flex flex-col relative" style={{ background: "var(--background)", maxWidth: 430, margin: "0 auto" }}>
@@ -787,5 +907,13 @@ export default function App() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LiveProvider>
+      <AppInner />
+    </LiveProvider>
   );
 }
