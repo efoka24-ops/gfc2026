@@ -13,6 +13,8 @@ class AuthController extends Controller
 {
     public function login(Request $request): JsonResponse
     {
+        \Log::info('LOGIN ATTEMPT', ['email' => $request->email]);
+        
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string',
@@ -22,11 +24,21 @@ class AuthController extends Controller
                     ->where('active', true)
                     ->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Identifiants incorrects.'],
-            ]);
+        if (! $user) {
+            \Log::warning('USER NOT FOUND', ['email' => $request->email]);
+            return response()->json([
+                'message' => 'Utilisateur non trouvé ou inactif.',
+            ], 401);
         }
+
+        if (! Hash::check($request->password, $user->password)) {
+            \Log::warning('INVALID PASSWORD', ['email' => $request->email]);
+            return response()->json([
+                'message' => 'Mot de passe incorrect.',
+            ], 401);
+        }
+
+        \Log::info('LOGIN SUCCESS', ['email' => $request->email]);
 
         // Révoquer les tokens existants du même appareil
         $user->tokens()->where('name', $request->device_name ?? 'api')->delete();

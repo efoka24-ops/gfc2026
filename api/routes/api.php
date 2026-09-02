@@ -3,20 +3,30 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\MatchController;
+use App\Http\Controllers\Api\CompetitionController;
+use App\Http\Controllers\Api\StandingsController;
 use Illuminate\Support\Facades\Route;
 
 // ── Authentification ──────────────────────────────────────────
 Route::post('/auth/login', [AuthController::class, 'login']);
+// Route /auth/quick-token RETIREE le 2026-09-02.
+// Elle delivrait un jeton administrateur complet a toute requete non
+// authentifiee : n'importe qui sur Internet devenait admin. Pour se
+// connecter, utiliser POST /auth/login avec de vrais identifiants.
+
+// ── Routes publiques (lecture, sans auth) ────────────────────────
+Route::get('/teams',             [TeamController::class, 'index']);
+Route::get('/teams/{team}',      [TeamController::class, 'show']);
+Route::get('/matches',           [MatchController::class, 'index']);
+Route::get('/matches/{match}',   [MatchController::class, 'show']);
+Route::get('/competitions',      [CompetitionController::class, 'index']);
+Route::get('/competitions/{competition}', [CompetitionController::class, 'show']);
+Route::get('/standings',         [StandingsController::class, 'index']);
+Route::get('/standings/{competition}', [StandingsController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me',     [AuthController::class, 'me']);
-
-    // ── Public (lecture) ──────────────────────────────────────
-    Route::get('/teams',             [TeamController::class, 'index']);
-    Route::get('/teams/{team}',      [TeamController::class, 'show']);
-    Route::get('/matches',           [MatchController::class, 'index']);
-    Route::get('/matches/{match}',   [MatchController::class, 'show']);
 
     // ── Secrétaire / Admin (saisie terrain) ───────────────────
     Route::middleware('role:admin,secretary')->group(function () {
