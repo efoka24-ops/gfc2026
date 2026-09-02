@@ -14,7 +14,7 @@ class GameMatch extends Model
     protected $table = 'matches';
 
     protected $fillable = [
-        'matchday_id', 'home_team_id', 'away_team_id',
+        'matchday_id', 'competition_id', 'home_team_id', 'away_team_id',
         'scheduled_at', 'venue', 'status', 'minute',
         'home_score', 'away_score',
     ];

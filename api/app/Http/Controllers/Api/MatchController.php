@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\GameMatch;
 use App\Models\MatchEvent;
+use App\Models\Matchday;
+use App\Models\Season;
 use App\Models\Standing;
 use App\Services\StandingService;
 use Illuminate\Http\JsonResponse;
@@ -39,14 +41,85 @@ class MatchController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'matchday_id'  => 'required|exists:matchdays,id',
-            'home_team_id' => 'required|exists:teams,id|different:away_team_id',
-            'away_team_id' => 'required|exists:teams,id',
-            'scheduled_at' => 'required|date',
-            'venue'        => 'nullable|string|max:200',
+            'matchday_id'    => 'required|exists:matchdays,id',
+            'competition_id' => 'nullable|exists:competitions,id',
+            'home_team_id'   => 'required|exists:teams,id|different:away_team_id',
+            'away_team_id'   => 'required|exists:teams,id',
+            'scheduled_at'   => 'required|date',
+            'venue'          => 'nullable|string|max:200',
         ]);
 
-        return response()->json(GameMatch::create($data), 201);
+        $match = GameMatch::create($data);
+
+        return response()->json($match->load(['homeTeam', 'awayTeam', 'matchday']), 201);
+    }
+
+    /**
+     * Supprime un match programme et tout ce qui en depend (evenements,
+     * compositions). Reserve a l'administrateur.
+     */
+    public function destroy(GameMatch $match): JsonResponse
+    {
+        $seasonId = $match->matchday?->season_id;
+
+        $match->events()->delete();
+        $match->lineups()->delete();
+        $match->delete();
+
+        // Le classement peut avoir change si le match etait termine.
+        if ($seasonId) {
+            $this->standingService->recalculate($seasonId);
+        }
+
+        return response()->json(null, 204);
+    }
+
+    // ── Journees (calendrier) ─────────────────────────────────
+
+    /**
+     * Liste des journees, filtrable par saison (?season_id=). A defaut, les
+     * journees de la saison active.
+     */
+    public function matchdays(Request $request): JsonResponse
+    {
+        $seasonId = $request->filled('season_id')
+            ? (int) $request->query('season_id')
+            : optional(Season::where('active', true)->first())->id;
+
+        $matchdays = Matchday::when($seasonId, fn ($q) => $q->where('season_id', $seasonId))
+            ->orderBy('number')
+            ->get();
+
+        return response()->json($matchdays);
+    }
+
+    /**
+     * Cree une journee dans la saison active (ou celle passee en season_id).
+     * Reserve a l'administrateur — c'est la base du calendrier du championnat.
+     */
+    public function storeMatchday(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'season_id' => 'nullable|exists:seasons,id',
+            'number'    => 'required|integer|min:1|max:60',
+            'label'     => 'nullable|string|max:80',
+            'date'      => 'nullable|date',
+        ]);
+
+        $data['season_id'] ??= optional(Season::where('active', true)->first())->id;
+
+        if (! $data['season_id']) {
+            return response()->json(
+                ['message' => 'Aucune saison active. Precisez season_id.'],
+                422
+            );
+        }
+
+        $data['label'] ??= 'Journee ' . $data['number'];
+
+        $matchday = Matchday::create($data);
+
+        return response()->json($matchday, 201);
     }
 
     // ── Contrôle du match (LIVE) ──────────────────────────────
