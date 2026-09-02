@@ -20,4 +20,7 @@ class Player extends Model
 
     public function team(): BelongsTo  { return $this->belongsTo(Team::class); }
     public function events(): HasMany  { return $this->hasMany(MatchEvent::class); }
+
+    /** Evenements ou ce joueur est le passeur decisif (assist_player_id). */
+    public function assistEvents(): HasMany { return $this->hasMany(MatchEvent::class, 'assist_player_id'); }
 }

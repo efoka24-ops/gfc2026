@@ -24,9 +24,26 @@ class PlayerController extends Controller
      * des joueurs inactifs (?all=1). Par defaut, joueurs actifs uniquement,
      * groupables cote client par poste.
      */
+    /**
+     * Buts et passes decisives, derives des evenements de match.
+     * Ajoutes en agregats a chaque requete pour ne jamais stocker de compteur
+     * qui pourrait diverger des evenements reels.
+     */
+    private function withStats($query)
+    {
+        return $query->withCount([
+            'events as goals' => fn ($q) => $q->whereIn('type', ['goal', 'penalty_scored']),
+            'assistEvents as assists' => fn ($q) => $q->whereIn('type', ['goal', 'penalty_scored']),
+            'events as yellow_cards' => fn ($q) => $q->whereIn('type', ['yellow_card', 'yellow_red_card']),
+            'events as red_cards' => fn ($q) => $q->whereIn('type', ['red_card', 'yellow_red_card']),
+        ]);
+    }
+
     public function index(Request $request): JsonResponse
     {
-        $query = Player::query()->with('team:id,name,short_name,primary_color');
+        $query = $this->withStats(
+            Player::query()->with('team:id,name,short_name,primary_color')
+        );
 
         if ($request->filled('team_id')) {
             $query->where('team_id', (int) $request->query('team_id'));
@@ -35,17 +52,29 @@ class PlayerController extends Controller
             $query->where('active', true);
         }
 
-        $players = $query
-            ->orderByRaw("FIELD(position,'GK','DEF','MID','FWD')")
-            ->orderBy('jersey_number')
-            ->orderBy('last_name')
-            ->get();
+        // ?sort=scorers -> classement des buteurs (buts, puis passes)
+        if ($request->query('sort') === 'scorers') {
+            $query->orderByDesc('goals')->orderByDesc('assists');
+            if ($request->filled('limit')) {
+                $query->limit(max(1, min(100, (int) $request->query('limit'))));
+            }
+        } else {
+            $query->orderByRaw("FIELD(position,'GK','DEF','MID','FWD')")
+                  ->orderBy('jersey_number')
+                  ->orderBy('last_name');
+        }
 
-        return response()->json($players);
+        return response()->json($query->get());
     }
 
     public function show(Player $player): JsonResponse
     {
+        $player->loadCount([
+            'events as goals' => fn ($q) => $q->whereIn('type', ['goal', 'penalty_scored']),
+            'assistEvents as assists' => fn ($q) => $q->whereIn('type', ['goal', 'penalty_scored']),
+            'events as yellow_cards' => fn ($q) => $q->whereIn('type', ['yellow_card', 'yellow_red_card']),
+            'events as red_cards' => fn ($q) => $q->whereIn('type', ['red_card', 'yellow_red_card']),
+        ]);
         return response()->json($player->load('team:id,name,short_name,primary_color'));
     }
 

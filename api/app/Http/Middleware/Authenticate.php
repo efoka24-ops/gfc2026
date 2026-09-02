@@ -12,6 +12,12 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('login');
+        // Une API ne redirige jamais vers une page de login (qui n'existe pas) :
+        // toute requete /api ou attendant du JSON obtient un 401 propre plutot
+        // qu un 500 "Route [login] not defined".
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return null;
+        }
+        return null;
     }
 }

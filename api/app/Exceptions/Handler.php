@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -25,6 +27,15 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        // Toute erreur d'authentification sur l'API renvoie un 401 JSON, jamais
+        // une redirection vers "login" (qui provoquait une 500).
+        $this->renderable(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json(['message' => 'Non authentifie. Reconnectez-vous.'], 401);
+            }
+            return null;
         });
     }
 }
