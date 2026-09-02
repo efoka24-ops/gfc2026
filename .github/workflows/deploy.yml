@@ -1,8 +1,21 @@
 name: Deploy to Camoo via FTP
 
+# DECLENCHEMENT MANUEL UNIQUEMENT (workflow_dispatch).
+#
+# L auto-deploiement sur push a ete retire volontairement le 2026-09-02 :
+#   - il pointait sur la branche `main`, qui contient un ancien code sans
+#     rapport avec cette application ;
+#   - le .env genere ci-dessous doit correspondre EXACTEMENT a la base et aux
+#     secrets du serveur (DB trugro9159_gfc2026, APP_KEY, FTP_PASSWORD, PUSHER),
+#     sinon config:cache fige de mauvais identifiants et casse la prod ;
+#   - le miroir FTP peut supprimer des fichiers du serveur absents du depot
+#     (ex. /dashboard, /mobile) — a verifier avant tout lancement.
+#
+# Avant de lancer ce workflow : verifier les secrets GitHub et tester d abord
+# sur un environnement de recette. Le deploiement courant se fait par FTP
+# direct, fichier par fichier.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   # ── Build Laravel (backend) ──────────────────────────────────
@@ -37,8 +50,8 @@ jobs:
           DB_CONNECTION=mysql
           DB_HOST=localhost
           DB_PORT=3306
-          DB_DATABASE=trugro9159_gfc
-          DB_USERNAME=trugro9159_gfc
+          DB_DATABASE=trugro9159_gfc2026
+          DB_USERNAME=trugro9159_gfc2026
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
           CACHE_DRIVER=file
