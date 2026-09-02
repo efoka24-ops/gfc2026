@@ -204,23 +204,33 @@ CREATE TABLE device_tokens (
 ) ENGINE=InnoDB;
 
 -- Classement calculé (championnat) : vue réutilisée par l'API et le back-office
+-- Classement calcule (invariant I2 : seuls les matchs 'finished' comptent).
+--
+-- Le classement part des equipes ENGAGEES dans la competition, pas des equipes
+-- qui ont deja joue : avant la premiere journee, les 10 equipes doivent
+-- apparaitre a 0 point plutot que de laisser un tableau vide, et une equipe qui
+-- n'a pas encore joue ne doit pas disparaitre du classement.
 CREATE OR REPLACE VIEW v_standings AS
 SELECT
-  m.competition_id,
-  t.id  AS team_id,
+  ct.competition_id,
+  t.id AS team_id,
   t.name, t.abbr, t.logo, t.color,
-  COUNT(*)                                                   AS played,
-  SUM(gf > ga)                                               AS won,
-  SUM(gf = ga)                                               AS drawn,
-  SUM(gf < ga)                                               AS lost,
-  SUM(gf)                                                    AS goals_for,
-  SUM(ga)                                                    AS goals_against,
-  SUM(gf) - SUM(ga)                                          AS goal_diff,
-  SUM(CASE WHEN gf > ga THEN 3 WHEN gf = ga THEN 1 ELSE 0 END) AS points
-FROM (
-  SELECT id, competition_id, home_team_id AS team_id, home_score AS gf, away_score AS ga FROM matches WHERE status='finished'
+  COALESCE(SUM(m.team_id IS NOT NULL), 0)                              AS played,
+  COALESCE(SUM(m.gf > m.ga), 0)                                        AS won,
+  COALESCE(SUM(m.gf = m.ga), 0)                                        AS drawn,
+  COALESCE(SUM(m.gf < m.ga), 0)                                        AS lost,
+  COALESCE(SUM(m.gf), 0)                                               AS goals_for,
+  COALESCE(SUM(m.ga), 0)                                               AS goals_against,
+  COALESCE(SUM(m.gf), 0) - COALESCE(SUM(m.ga), 0)                      AS goal_diff,
+  COALESCE(SUM(CASE WHEN m.gf > m.ga THEN 3 WHEN m.gf = m.ga THEN 1 ELSE 0 END), 0) AS points
+FROM competition_team ct
+JOIN teams t ON t.id = ct.team_id
+LEFT JOIN (
+  SELECT competition_id, home_team_id AS team_id, home_score AS gf, away_score AS ga
+    FROM matches WHERE status = 'finished'
   UNION ALL
-  SELECT id, competition_id, away_team_id AS team_id, away_score AS gf, home_score AS ga FROM matches WHERE status='finished'
+  SELECT competition_id, away_team_id AS team_id, away_score AS gf, home_score AS ga
+    FROM matches WHERE status = 'finished'
 ) AS m
-JOIN teams t ON t.id = m.team_id
-GROUP BY m.competition_id, t.id;
+  ON m.team_id = ct.team_id AND m.competition_id = ct.competition_id
+GROUP BY ct.competition_id, t.id, t.name, t.abbr, t.logo, t.color;
