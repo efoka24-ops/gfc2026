@@ -226,7 +226,7 @@ function LiveProvider({ children }: { children: any }) {
     let on = true;
     (async () => {
       const [standings, teams, matches, comps, players] = await Promise.all([
-        j("/standings"), j("/teams"), j("/matches"), j("/competitions"), j("/players"),
+        j("/standings"), j("/teams"), j("/matches"), j("/competitions"), j("/players?sort=scorers&limit=20"),
       ]);
       const compName: Record<number, string> = {};
       comps.forEach((c: any) => { compName[c.id] = c.name; });
