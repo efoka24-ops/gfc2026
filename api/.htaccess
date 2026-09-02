@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Securite : bloquer l'acces direct aux fichiers et dossiers internes.
+    # La racine web etant le projet entier, ces chemins seraient servis en
+    # clair. Ne touche ni /api, ni /dashboard, ni /mobile, ni /public.
+    RewriteRule ^(\.env|artisan|composer\.(json|lock)|setup-web\.php|deploy-webhook\.php)$ - [F,L]
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|tests|vendor)(/|$) - [F,L]
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
