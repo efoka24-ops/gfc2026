@@ -103,6 +103,9 @@ final class SiteController extends Controller
             case $path === '/buteurs':
                 $this->view('site/buteurs', $common + ['scorers' => (new PlayerRepository($this->db))->topScorers($ed, 40)]);
 
+            case $path === '/inscription':
+                $this->view('site/inscription', $common);
+
             case $path === '/medias':
                 $tab = $req->str('tab', 'actualites');
                 $this->view('site/medias', $common + [
