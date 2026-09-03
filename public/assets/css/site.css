@@ -129,3 +129,25 @@ img { max-width: 100%; }
 .foot__inner a { display: block; margin-bottom: 8px; font-size: 12.5px; color: rgba(255, 255, 255, .6); }
 .foot__inner a:hover { color: #fff; }
 .foot__bar { border-top: 1px solid rgba(255, 255, 255, .08); padding: 16px 0; font-size: 11.5px; color: rgba(255, 255, 255, .35); }
+
+/* Pages internes */
+.page{padding:28px 0 40px}
+.page__head{margin-bottom:20px}
+.page__kicker{font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:#e8720c;text-transform:uppercase;font-size:14px}
+.page__title{font-family:'Oswald',sans-serif;font-weight:700;font-size:30px;color:#7a1c2a;margin:2px 0 0;text-transform:uppercase}
+.page__sub{color:#7a5a60;font-size:14px;margin-top:4px}
+.gcard{background:#fff;border:1px solid rgba(122,28,42,.12);border-radius:16px;padding:16px;margin-bottom:14px}
+.gtable{width:100%;border-collapse:collapse;font-size:14px}
+.gtable th{background:#7a1c2a;color:#fff;text-transform:uppercase;font-size:11px;letter-spacing:.5px;padding:10px;text-align:left}
+.gtable td{padding:10px;border-top:1px solid rgba(122,28,42,.08)}
+.gtable tr:nth-child(even) td{background:#faf6f1}
+.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.gitem{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid rgba(122,28,42,.12);border-radius:14px;padding:14px}
+.gbadge{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Oswald',sans-serif;font-weight:700;flex:0 0 auto;overflow:hidden}
+.gbadge img{width:100%;height:100%;object-fit:cover}
+.gmedia{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.gmedia figure{margin:0;border-radius:14px;overflow:hidden;background:#fff;border:1px solid rgba(122,28,42,.12)}
+.gmedia img{width:100%;height:160px;object-fit:cover;display:block}
+.gmedia figcaption{padding:10px 12px;font-size:13px;color:#5a3a40}
+.gpill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700}
+.gpill--live{background:#ffe3e3;color:#c0392b}.gpill--fin{background:#e8ddd5;color:#5a3a40}.gpill--prog{background:#fdeede;color:#a4671f}
