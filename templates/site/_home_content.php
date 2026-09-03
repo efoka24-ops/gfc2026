@@ -1,3 +1,4 @@
+<?php use Gfc\Core\View; ?>
 
   <section class="hero">
     <div class="hero__text">
