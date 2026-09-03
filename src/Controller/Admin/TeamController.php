@@ -18,6 +18,7 @@ final class TeamController extends Controller
             ['name'=>'color_primary','label'=>'Couleur 1','type'=>'color','default'=>'#7a1c2a'],
             ['name'=>'color_secondary','label'=>'Couleur 2','type'=>'color','default'=>'#e8720c'],
             ['name'=>'status','label'=>'Statut','type'=>'select','options'=>['pending'=>'En attente','validated'=>'Validé','rejected'=>'Rejeté']],
+            ['name'=>'logo_path','label'=>'Logo','type'=>'file','nullable'=>true],
         ];
     }
     public function index(Request $req, array $args): never

@@ -35,6 +35,11 @@ $renderField = static function (array $f, array $row = []): string {
         $out .= '<input class="input" type="password" name="' . $h($name) . '" autocomplete="new-password">';
     } elseif ($type === 'slug') {
         $out .= '<input class="input" type="text" name="' . $h($name) . '" value="' . $h($val) . '" placeholder="(auto)">';
+    } elseif ($type === 'file') {
+        if ($val) {
+            $out .= '<img src="' . $h($val) . '" alt="" style="height:40px;border-radius:6px;margin-bottom:6px;display:block;object-fit:cover">';
+        }
+        $out .= '<input class="input" type="file" name="' . $h($name) . '" accept="image/*">';
     } else {
         $it = in_array($type, ['date','datetime-local','number','email','color'], true) ? $type : 'text';
         if ($type === 'datetime-local' && $val) { $val = str_replace(' ', 'T', substr((string) $val, 0, 16)); }
@@ -50,7 +55,7 @@ ob_start();
 
 <details class="card card--pad" style="margin-bottom:16px">
   <summary style="cursor:pointer;font-weight:600;color:var(--primary)">+ Ajouter <?= View::e($crud['title']) ?></summary>
-  <form method="post" action="/admin/<?= View::e($entity) ?>" style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:end">
+  <form method="post" action="/admin/<?= View::e($entity) ?>" enctype="multipart/form-data" style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;align-items:end">
     <input type="hidden" name="_action" value="create">
     <?php foreach ($fields as $f): if (!empty($f['noform'])) continue; ?>
       <?= $renderField($f) ?>
@@ -75,7 +80,7 @@ ob_start();
             <details style="display:inline-block">
               <summary class="btn btn--mini" style="list-style:none">Éditer</summary>
               <div class="card card--pad" style="position:absolute;right:24px;z-index:5;min-width:280px;box-shadow:0 12px 40px rgba(0,0,0,.2)">
-                <form method="post" action="/admin/<?= View::e($entity) ?>" style="display:grid;gap:10px">
+                <form method="post" action="/admin/<?= View::e($entity) ?>" enctype="multipart/form-data" style="display:grid;gap:10px">
                   <input type="hidden" name="_action" value="update">
                   <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
                   <?php foreach ($fields as $f): if (!empty($f['noform'])) continue; ?>

@@ -23,12 +23,12 @@ final class Crud
 
         try {
             if ($action === 'create') {
-                $data = self::collect($req, $fields, false) + $defaults;
+                $data = self::collect($req, $fields, false) + self::collectFiles($fields) + $defaults;
                 self::autoSlug($fields, $data);
                 $newId = $db->insert($table, $data);
                 $auth->log($user['id'] ?? null, $table . '.create', $table, $newId);
             } elseif ($action === 'update' && $id > 0) {
-                $data = self::collect($req, $fields, true);
+                $data = self::collect($req, $fields, true) + self::collectFiles($fields);
                 if ($data !== []) {
                     self::autoSlug($fields, $data);
                     $db->update($table, $id, $data);
@@ -79,6 +79,29 @@ final class Crud
             $data[$name] = $v;
         }
         return $data;
+    }
+
+    /** Traite les fichiers uploades (type 'file'). Retourne [colonne => '/uploads/xxx']. */
+    private static function collectFiles(array $fields): array
+    {
+        $out = [];
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+        $dir = (defined('BASE_PATH') ? BASE_PATH : dirname(__DIR__, 2)) . '/public/uploads';
+        foreach ($fields as $f) {
+            if (($f['type'] ?? '') !== 'file') { continue; }
+            $n = $f['name'];
+            if (empty($_FILES[$n]['tmp_name']) || ($_FILES[$n]['error'] ?? 1) !== UPLOAD_ERR_OK) { continue; }
+            if (($_FILES[$n]['size'] ?? 0) > 10 * 1024 * 1024) { continue; }
+            $ext = strtolower(pathinfo((string) $_FILES[$n]['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowed, true)) { continue; }
+            if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
+            $fname = bin2hex(random_bytes(8)) . '.' . $ext;
+            $ok = is_uploaded_file($_FILES[$n]['tmp_name'])
+                ? move_uploaded_file($_FILES[$n]['tmp_name'], $dir . '/' . $fname)
+                : rename($_FILES[$n]['tmp_name'], $dir . '/' . $fname);
+            if ($ok) { $out[$n] = '/uploads/' . $fname; }
+        }
+        return $out;
     }
 
     /** Genere un slug si le champ existe, est vide, et qu une source est definie. */

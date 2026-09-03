@@ -23,6 +23,7 @@ final class PlayerController extends Controller
             ['name'=>'shirt_no','label'=>'Numéro','type'=>'number','nullable'=>true],
             ['name'=>'license_no','label'=>'Licence','type'=>'text','nullable'=>true],
             ['name'=>'license_status','label'=>'Statut licence','type'=>'select','options'=>['pending'=>'En attente','valid'=>'Valide','missing'=>'Manquante']],
+            ['name'=>'photo_path','label'=>'Photo','type'=>'file','nullable'=>true],
         ];
     }
     public function index(Request $req, array $args): never

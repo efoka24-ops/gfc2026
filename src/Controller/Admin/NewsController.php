@@ -17,6 +17,7 @@ final class NewsController extends Controller
             ['name'=>'body','label'=>'Contenu','type'=>'textarea','nullable'=>true],
             ['name'=>'status','label'=>'Statut','type'=>'select','options'=>['draft'=>'Brouillon','scheduled'=>'Programmé','published'=>'Publié']],
             ['name'=>'published_at','label'=>'Publié le','type'=>'datetime-local','nullable'=>true],
+            ['name'=>'cover_path','label'=>'Image de couverture','type'=>'file','nullable'=>true],
         ];
     }
     public function index(Request $req, array $args): never

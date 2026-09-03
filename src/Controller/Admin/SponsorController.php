@@ -17,6 +17,7 @@ final class SponsorController extends Controller
             ['name'=>'status','label'=>'Statut','type'=>'select','options'=>['active'=>'Actif','expiring'=>'Bientôt expiré','inactive'=>'Inactif']],
             ['name'=>'starts_on','label'=>'Début','type'=>'date','nullable'=>true],
             ['name'=>'ends_on','label'=>'Fin','type'=>'date','nullable'=>true],
+            ['name'=>'logo_path','label'=>'Logo','type'=>'file','nullable'=>true],
         ];
     }
     public function index(Request $req, array $args): never
