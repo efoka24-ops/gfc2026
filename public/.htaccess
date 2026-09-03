@@ -1,0 +1,22 @@
+RewriteEngine On
+
+# Fichiers réels servis directement
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Tout le reste passe par le front controller
+RewriteRule ^ index.php [QSA,L]
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+<FilesMatch "\.(css|js|woff2|png|jpg|svg)$">
+  <IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 7 days"
+  </IfModule>
+</FilesMatch>
