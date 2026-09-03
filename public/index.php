@@ -76,15 +76,23 @@ $router->post('/admin/account', ['Gfc\Controller\Admin\AccountController', 'save
 $router->get('/admin',              ['Gfc\Controller\Admin\DashboardController', 'index']);
 $router->get('/admin/live',         ['Gfc\Controller\Admin\LiveController', 'index']);
 $router->get('/admin/competitions', ['Gfc\Controller\Admin\CompetitionController', 'index']);
+$router->post('/admin/competitions', ['Gfc\Controller\Admin\CompetitionController', 'save']);
 $router->get('/admin/calendar',     ['Gfc\Controller\Admin\CalendarController', 'index']);
+$router->post('/admin/calendar', ['Gfc\Controller\Admin\CalendarController', 'save']);
 $router->get('/admin/standings',    ['Gfc\Controller\Admin\StandingController', 'index']);
 $router->get('/admin/sanctions',    ['Gfc\Controller\Admin\SanctionController', 'index']);
+$router->post('/admin/sanctions', ['Gfc\Controller\Admin\SanctionController', 'save']);
 $router->get('/admin/teams',        ['Gfc\Controller\Admin\TeamController', 'index']);
+$router->post('/admin/teams', ['Gfc\Controller\Admin\TeamController', 'save']);
 $router->get('/admin/players',      ['Gfc\Controller\Admin\PlayerController', 'index']);
+$router->post('/admin/players', ['Gfc\Controller\Admin\PlayerController', 'save']);
 $router->get('/admin/users',        ['Gfc\Controller\Admin\UserController', 'index']);
+$router->post('/admin/users', ['Gfc\Controller\Admin\UserController', 'save']);
 $router->get('/admin/news',         ['Gfc\Controller\Admin\NewsController', 'index']);
+$router->post('/admin/news', ['Gfc\Controller\Admin\NewsController', 'save']);
 $router->get('/admin/tickets',      ['Gfc\Controller\Admin\TicketController', 'index']);
 $router->get('/admin/sponsors',     ['Gfc\Controller\Admin\SponsorController', 'index']);
+$router->post('/admin/sponsors', ['Gfc\Controller\Admin\SponsorController', 'save']);
 
 // ── Application web publique (SPA légère servie par PHP) ─────────────────────
 $router->get('/{any:.*}', ['Gfc\Controller\SiteController', 'index']);
