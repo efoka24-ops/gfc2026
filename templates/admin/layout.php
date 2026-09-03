@@ -59,7 +59,7 @@ $roleLabels = ['admin' => 'Administrateur', 'delegate' => 'Délégué équipe', 
     </nav>
     <div class="sidebar__foot">
       <p class="nav__group">Connecté en tant que</p>
-      <p class="user__name"><?= View::e($user['name']) ?></p>
+      <p class="user__name"><a href="/admin/account" style="color:inherit"><?= View::e($user['name']) ?></a></p>
       <p class="user__role"><?= View::e($roleLabels[$user['role']] ?? $user['role']) ?></p>
       <form method="post" action="/admin/logout"><button class="btn btn--ghost btn--block">Se déconnecter</button></form>
     </div>

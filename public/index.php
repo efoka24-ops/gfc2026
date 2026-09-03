@@ -71,6 +71,8 @@ $router->post('/api/matches/{id}/validate',            ['Gfc\Controller\Api\Matc
 $router->get('/admin/login',   ['Gfc\Controller\Admin\AuthController', 'form']);
 $router->post('/admin/login',  ['Gfc\Controller\Admin\AuthController', 'login']);
 $router->post('/admin/logout', ['Gfc\Controller\Admin\AuthController', 'logout']);
+$router->get('/admin/account',  ['Gfc\Controller\Admin\AccountController', 'form']);
+$router->post('/admin/account', ['Gfc\Controller\Admin\AccountController', 'save']);
 $router->get('/admin',              ['Gfc\Controller\Admin\DashboardController', 'index']);
 $router->get('/admin/live',         ['Gfc\Controller\Admin\LiveController', 'index']);
 $router->get('/admin/competitions', ['Gfc\Controller\Admin\CompetitionController', 'index']);

@@ -192,7 +192,7 @@ use Gfc\Core\View;
       <a href="/inscription">Inscrire une équipe</a><a href="/mon-espace">Mon espace</a><a href="/admin">Espace administration</a>
     </div>
   </div>
-  <div class="foot__bar"><div class="wrap">© <?= date('Y') ?> Garoua Football Challenge · application web &amp; back office PHP 8.1</div></div>
+  <div class="foot__bar"><div class="wrap">© <?= date('Y') ?> Garoua Football Challenge</div></div>
 </footer>
 
 <script src="/assets/js/app.js" defer></script>

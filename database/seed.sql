@@ -63,7 +63,7 @@ INSERT INTO players (team_id, first_name, last_name, position, shirt_no, license
 
 -- Mot de passe de démonstration : gfc2026
 INSERT INTO users (id, name, phone, email, password_hash, role, team_id, status) VALUES
-  (1, 'Gabriel Ndjidda',  '+237690000001', 'admin@gfc.cm',   '$2y$10$TvFdYz9ofjADyU5CmQxFPuWH4PzimSAxzpWzjHTO06jbB8vggE52q', 'admin',    NULL, 'active'),
+  (1, 'Super Admin',  '+237690000001', 'admin@gfc.cm',   '$2y$10$TvFdYz9ofjADyU5CmQxFPuWH4PzimSAxzpWzjHTO06jbB8vggE52q', 'admin',    NULL, 'active'),
   (2, 'Ibrahim Moussa',   '+237677000002', NULL,             '$2y$10$TvFdYz9ofjADyU5CmQxFPuWH4PzimSAxzpWzjHTO06jbB8vggE52q', 'delegate', 1,    'active'),
   (3, 'Hamadou Oumarou',  '+237696000003', NULL,             '$2y$10$TvFdYz9ofjADyU5CmQxFPuWH4PzimSAxzpWzjHTO06jbB8vggE52q', 'referee',  NULL, 'active'),
   (4, 'Aboubakar Sanda',  '+237671000004', NULL,             '$2y$10$TvFdYz9ofjADyU5CmQxFPuWH4PzimSAxzpWzjHTO06jbB8vggE52q', 'referee',  NULL, 'active'),

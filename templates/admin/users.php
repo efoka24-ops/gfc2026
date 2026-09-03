@@ -21,7 +21,7 @@ $permissions = [
     'Gérer la billetterie'             => ['admin' => 'oui', 'delegate' => 'non',     'referee' => 'non'],
     'Prononcer une sanction'           => ['admin' => 'oui', 'delegate' => 'non',     'referee' => 'non'],
 ];
-$marks = ['oui' => ['✓', 'yes'], 'partiel' => ['~', 'partial'], 'non' => ['✕', 'no']];
+$marks = ['oui' => ['Oui', 'yes'], 'partiel' => ['Part.', 'partial'], 'non' => ['Non', 'no']];
 ?>
 <div class="card card--pad">
   <p class="card__title">Matrice des permissions</p>

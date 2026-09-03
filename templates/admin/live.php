@@ -6,7 +6,7 @@ $kicker   = 'Feuille de match numérique';
 $subtitle = $match === null ? 'Aucune rencontre sélectionnée' : $match['home'] . ' – ' . $match['away'];
 $action   = $match === null ? '' : 'Clôturer le match';
 
-$icons = ['goal' => '⚽', 'penalty' => '⚽', 'own_goal' => '⚽', 'yellow' => '🟨', 'red' => '🟥', 'sub' => '🔁', 'shot' => '🅾', 'period' => '⏱', 'miss' => '🅾', 'note' => '📝'];
+$icons = ['goal' => 'BUT', 'penalty' => 'PEN', 'own_goal' => 'CSC', 'yellow' => 'JA', 'red' => 'RO', 'sub' => 'CHG', 'shot' => 'TIR', 'period' => 'T', 'miss' => 'MAN', 'note' => 'NOTE'];
 $labels = ['goal' => 'But', 'penalty' => 'Penalty', 'own_goal' => 'CSC', 'yellow' => 'Carton jaune', 'red' => 'Carton rouge', 'sub' => 'Changement', 'shot' => 'Tir', 'period' => 'Période', 'miss' => 'Occasion', 'note' => 'Note'];
 
 ob_start();
@@ -82,7 +82,7 @@ ob_start();
             <p class="tl__player"><?= View::e((string) ($e['player'] ?? $labels[$e['type']] ?? '—')) ?></p>
             <p class="tl__detail"><?= View::e($labels[$e['type']] ?? $e['type']) ?><?= $e['team_name'] ? ' · ' . View::e($e['team_name']) : '' ?></p>
           </div>
-          <button class="tl__del" data-delete="<?= (int) $e['id'] ?>">✕</button>
+          <button class="tl__del" data-delete="<?= (int) $e['id'] ?>">&times;</button>
         </div>
       <?php endforeach; ?>
       <?php if ($match['events'] === []): ?><p class="panel__note">Aucun événement enregistré.</p><?php endif; ?>

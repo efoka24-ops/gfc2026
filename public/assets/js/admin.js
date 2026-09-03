@@ -12,7 +12,7 @@
   const playerEl = root.querySelector('[data-player]');
   let pending    = null;
 
-  const ICONS  = { goal: '⚽', penalty: '⚽', own_goal: '⚽', yellow: '🟨', red: '🟥', sub: '🔁', shot: '🅾', period: '⏱' };
+  const ICONS  = { goal: 'BUT', penalty: 'PEN', own_goal: 'CSC', yellow: 'JA', red: 'RO', sub: 'CHG', shot: 'TIR', period: 'T' };
   const LABELS = { goal: 'But', penalty: 'Penalty', own_goal: 'CSC', yellow: 'Carton jaune', red: 'Carton rouge', sub: 'Changement', shot: 'Tir', period: 'Période' };
 
   async function post(path, body) {
@@ -90,7 +90,7 @@
       '<span class="tl__icon">' + (ICONS[type] || '•') + '</span>' +
       '<div class="tl__body"><p class="tl__player">' + (player || LABELS[type] || type) + '</p>' +
       '<p class="tl__detail">' + (LABELS[type] || type) + '</p></div>' +
-      '<button class="tl__del" data-delete="' + id + '">✕</button>';
+      '<button class="tl__del" data-delete="' + id + '">&times;</button>';
     timeline.prepend(row);
     bindDelete(row.querySelector('[data-delete]'));
   }
