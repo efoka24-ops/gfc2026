@@ -1,13 +1,9 @@
-# Racine du domaine = racine du projet. Rediriger tout vers public/ et proteger
-# les dossiers internes. (Sur un hote ou public/ peut etre le DocumentRoot,
-# ce fichier est inutile.)
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
     RewriteRule ^(config|src|database|templates|storage)(/|$) - [F,L]
-    RewriteRule ^(README\.md|\.gitignore)$ - [F,L]
 
     RewriteCond %{REQUEST_URI} !^/public/
     RewriteRule ^(.*)$ public/$1 [L]
